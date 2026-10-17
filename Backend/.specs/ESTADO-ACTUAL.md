@@ -7,9 +7,10 @@ Iteraciones chicas. Al terminar cada una: **parar**, mostrar archivos tocados, s
 **UC-02** (alta, edición y baja de colaboradores): crear su spec desde `_TEMPLATE-UC.md`. Incluye unicidad de email (índice único, P5) y validación del país contra Nager.Date (ADR-09).
 
 ## Dónde estamos
-- Fase 1 (andamiaje SDD) y Fase 2 (esqueleto técnico) cerradas y commiteadas; UC-01 (a) commiteado (`9fe4e9e`). Árbol limpio.
+- Fases 1 y 2 y **UC-01 completo** commiteados (último: `2a8b8cd`). Árbol limpio.
 - Build sin warnings, 27 tests verdes, `docker compose up` verificado (API en `localhost:5080`, BD en `127.0.0.1:5433`).
-- UC-01 (b) implementado y verificado, pendiente de commit: migración `InitialCreate`, semilla de 5 colaboradores y `GET /api/collaborators` (200). `dotnet-ef` 9.0.21 es herramienta local (`.config/dotnet-tools.json`): `dotnet dotnet-ef`.
+- Existe la migración `InitialCreate` (tabla `collaborators`) y la semilla de 5 colaboradores. `dotnet-ef` 9.0.21 es herramienta local (`.config/dotnet-tools.json`): `dotnet dotnet-ef`.
+- Migrar con `dotnet dotnet-ef migrations add <Name> --project src/ShiftManager.Infrastructure --startup-project src/ShiftManager.Api --output-dir Persistence/Migrations`. El `HostAbortedException` que imprime es ruido normal de las herramientas.
 
 ## Decisiones vigentes (las que no son obvias leyendo el código)
 - Rutas, campos, códigos y mensajes de error de la API, en inglés (`/api/collaborators`, `/api/shifts`, `shift.overlap`).
@@ -22,21 +23,21 @@ Iteraciones chicas. Al terminar cada una: **parar**, mostrar archivos tocados, s
 - pgAdmin de escritorio en Windows: host `127.0.0.1` y `GSS encryption mode = disable` (ver skill `verify`).
 
 ## Bloque en curso
-UC-01 cerrado, a la espera de commit.
+Ninguno. UC-02 todavía sin spec.
 
 ## Abierto / pendientes con terceros
 - ADR-08 (Excel: ClosedXML vs MiniExcel) pendiente de `license-check`.
 - P5: email normalizado a minúsculas + índice único; se detalla en UC-02.
 - Cuando el front entre al compose, ajustar `Cors__AllowedOrigins__0` al puerto que publique.
 
-## Checklist de cierre de UC-01 (Paso 4 de `implement-use-case`)
-- [x] Build sin warnings y tests verdes (parte a)
-- [x] E2E con `docker compose up`
-- [x] ¿ADR nuevo? (ninguno)
-- [x] Spec con Tasks marcadas
-- [x] `docs/api/ENDPOINTS.md` actualizado
-- [x] `.http` con respuestas reales
-- [x] TBDs anotados
+## Checklist de cierre de UC-02 (Paso 4 de `implement-use-case`)
+- [ ] Build sin warnings y tests verdes
+- [ ] E2E con `docker compose up`
+- [ ] ¿ADR nuevo?
+- [ ] Spec con Tasks marcadas y "Para la revisión"
+- [ ] `docs/api/ENDPOINTS.md` actualizado
+- [ ] `.http` con respuestas reales
+- [ ] TBDs anotados
 
 ## Checklist de cierre del proyecto
 - [ ] Docker completo (`docker compose up` desde `shift-manager/`), con el front
@@ -46,4 +47,5 @@ UC-01 cerrado, a la espera de commit.
 - [ ] Revisión contra "qué valoran" (`00-requisitos.md` §2)
 
 ## Cerrado recientemente
+- 2026-10-17 · UC-01 (b): query, repositorio, migración inicial, semilla y endpoint → [historial](historial/2026-10-17-uc01-listar-colaboradores.md)
 - 2026-10-17 · Andamiaje SDD, esqueleto técnico y UC-01 (a) → [historial](historial/2026-10-17-andamiaje-y-esqueleto.md)
