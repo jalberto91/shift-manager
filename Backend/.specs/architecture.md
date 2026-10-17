@@ -24,7 +24,7 @@ Dependencias: `Domain ← Application ← Infrastructure ← Api` (Api compone t
 |---|---|---|
 | IDs | `Guid` generado en el dominio (`Guid.NewGuid()`), no autoincrementales | ✅ ADR-02 |
 | Dinero | No aplica (si apareciera: `decimal`) | ✅ |
-| Fechas/horas | Turno: `DateOnly` + `TimeOnly` sin zona (hora local del colaborador, P12). `DateTimeOffset` solo para auditoría (`CreatedAt`) si hace falta. Contrato JSON, entrada y salida: fecha `yyyy-MM-dd`, hora `HH:mm` (sin segundos), con un converter de `TimeOnly` | ✅ ADR-10 |
+| Fechas/horas | Turno: `DateOnly` + `TimeOnly` sin zona (hora local del colaborador, P12). `DateTimeOffset` solo para auditoría (`CreatedAt`) si hace falta. Contrato JSON con los formatos por defecto de .NET, sin converters propios: fecha `yyyy-MM-dd`; hora de salida `HH:mm:ss` (el front puede mostrar `HH:mm`), de entrada se acepta `HH:mm` o `HH:mm:ss` | ✅ ADR-10 |
 | Errores HTTP | RFC 7807 Problem Details + `traceId`. Negocio vía `Result<T>` → `400` con `errors` keyed por código estable **en inglés** (`collaborator.email`); `404` recurso inexistente; **`409` para conflictos de estado** (solape: `errors["shift.overlap"]` con el mensaje y `conflictingShiftId`; borrar colaborador con turnos: `collaborator.hasShifts`); `500` sin filtrar internals | ✅ ADR-04, ADR-10 |
 | Versionado de rutas | Sin versionado en v1; prefijo `/api/` | ✅ |
 | Paginación | No en v1 (P13); el filtro por fechas acota | ✅ |
@@ -67,7 +67,7 @@ Dependencias: `Domain ← Application ← Infrastructure ← Api` (Api compone t
 - **Estado**: Aceptado
 
 ### ADR-05 · Observabilidad
-- **Contexto**: los evaluadores verán `docker compose logs`.
+- **Contexto**: los logs se consultan con `docker compose logs`.
 - **Alternativas**: OpenTelemetry + collector.
 - **Decisión**: Serilog estructurado a consola + `traceId` en cada error. OpenTelemetry solo si queda tiempo, sin collector en el compose.
 - **Consecuencias**: (+) simple. (−) sin trazas distribuidas.
@@ -104,7 +104,7 @@ Dependencias: `Domain ← Application ← Infrastructure ← Api` (Api compone t
 ### ADR-10 · Regla de solape y fechas
 - **Contexto**: R3 es el corazón de la evaluación; P2, P3, P12.
 - **Alternativas**: intervalos cerrados; turnos que cruzan medianoche; `400` con código de negocio para el solape.
-- **Decisión**: intervalos semiabiertos `[inicio, fin)`: solape si `inicioA < finB && inicioB < finA`; solo mismo colaborador y misma fecha; `fin > inicio` (sin cruce de medianoche). Tipos `DateOnly`/`TimeOnly`; en el JSON la fecha es `yyyy-MM-dd` y la hora `HH:mm` (sin segundos), en entrada y salida, con un converter de `TimeOnly`. Al editar se excluye el propio turno. El conflicto devuelve **`409 Conflict`** con Problem Details y `errors["shift.overlap"]` con el mensaje, más `conflictingShiftId` (el id del turno con el que choca) (excepción documentada a "negocio → 400" de ADR-04: es un conflicto con el estado de otro recurso, no un dato mal formado).
+- **Decisión**: intervalos semiabiertos `[inicio, fin)`: solape si `inicioA < finB && inicioB < finA`; solo mismo colaborador y misma fecha; `fin > inicio` (sin cruce de medianoche). Tipos `DateOnly`/`TimeOnly`; en el JSON se usan los formatos por defecto de .NET, sin converters propios: fecha `yyyy-MM-dd`, hora de salida `HH:mm:ss`, de entrada `HH:mm` o `HH:mm:ss`. Al editar se excluye el propio turno. El conflicto devuelve **`409 Conflict`** con Problem Details y `errors["shift.overlap"]` con el mensaje, más `conflictingShiftId` (el id del turno con el que choca) (excepción documentada a "negocio → 400" de ADR-04: es un conflicto con el estado de otro recurso, no un dato mal formado).
 - **Consecuencias**: (+) regla simple de explicar, el front distingue el solape de un error de validación. (−) dos familias de código para errores de negocio (400/409).
 - **Estado**: Aceptado
 

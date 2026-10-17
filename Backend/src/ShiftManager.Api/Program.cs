@@ -1,6 +1,63 @@
-var builder = WebApplication.CreateBuilder(args);
-var app = builder.Build();
+using System.Diagnostics;
+using System.Text.Json.Serialization;
+using Scalar.AspNetCore;
+using Serilog;
 
-app.MapGet("/", () => "Hello World!");
+const string corsPolicy = "Frontend";
 
-app.Run();
+Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateBootstrapLogger();
+
+try
+{
+    var builder = WebApplication.CreateBuilder(args);
+
+    builder.Host.UseSerilog((context, services, configuration) => configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .ReadFrom.Services(services)
+        .Enrich.FromLogContext());
+
+    builder.Services.AddControllers()
+        .AddJsonOptions(options =>
+            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+    builder.Services.AddProblemDetails(options =>
+        options.CustomizeProblemDetails = context =>
+            context.ProblemDetails.Extensions["traceId"] =
+                Activity.Current?.TraceId.ToString() ?? context.HttpContext.TraceIdentifier);
+
+    builder.Services.AddOpenApi();
+
+    builder.Services.AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped);
+    builder.Services.AddHealthChecks();
+
+    var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
+    builder.Services.AddCors(options =>
+        options.AddPolicy(corsPolicy, policy => policy
+            .WithOrigins(allowedOrigins)
+            .AllowAnyHeader()
+            .AllowAnyMethod()));
+
+    var app = builder.Build();
+
+    app.UseExceptionHandler();
+    app.UseStatusCodePages();
+    app.UseSerilogRequestLogging();
+    app.UseCors(corsPolicy);
+
+    app.MapOpenApi();
+    app.MapScalarApiReference();
+
+    app.MapHealthChecks("/health");
+    app.MapControllers();
+
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "La API terminó de forma inesperada");
+    throw;
+}
+finally
+{
+    Log.CloseAndFlush();
+}

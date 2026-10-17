@@ -26,6 +26,9 @@ API REST (.NET 9) para gestionar turnos de trabajo de colaboradores de distintos
 - Serilog estructurado desde el día 1 (OpenTelemetry solo si sobra tiempo, ADR-05).
 - Tests: xUnit (+ NSubstitute o fakes a mano). Assertions con xUnit nativo o Shouldly.
 
+## Redacción
+En código, comentarios, specs, docs y README no se menciona quién evalúa o revisa el proyecto; se refiere solo a requisitos (R#, E#) y decisiones (P#, ADR).
+
 ## Principios de código
 - Domain puro (sin atributos EF ni frameworks).
 - DI explícita en `Program.cs`.

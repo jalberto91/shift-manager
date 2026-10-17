@@ -9,12 +9,15 @@ Iteraciones chicas. Al terminar cada una: **parar**, mostrar archivos tocados, s
 - Cada UC: (a) dominio + reglas + tests unitarios · (b) endpoint + infraestructura + docs/api + .http
 
 ## ⏭️ Próximo paso
-Iteración 6 hecha (sin commitear). Esperando tu "seguí" para la **iteración 7**: plomería (`Result<T>`, Problem Details + traceId, Serilog, OpenAPI, `/health`); antes, `license-check` de los NuGets (Serilog, Scalar/Swagger, Mediator…).
+Iteración 7 hecha (sin commitear). Esperando tu "seguí" para la **iteración 8**: DbContext con PostgreSQL + migración inicial (`license-check` de Npgsql EF 9.x y EF Core Design/Tools antes de instalar; agregar el chequeo de BD a `/health`).
 
 ## Dónde estamos
 - Fase 0 hecha: enunciado y requisitos cruzados sin discrepancias; SDK 9.0.308 y Docker 29.5.3 / Compose v5.1.4 disponibles.
 - Iteraciones 1-5 escritas juntas (antes de fijar esta regla); pendientes de tu revisión y de commits separados. `global.json` y `.dockerignore` ya existen y se commitean con la iteración 6.
 - Sin código de negocio todavía.
+
+## Pendiente para la iteración 9 (Docker)
+El compose debe fijar `Cors__AllowedOrigins__0` con el origen del front en contenedor; `appsettings.json` solo trae `http://localhost:4200`.
 
 ## Bloque en curso
 Revisión de iteraciones 1-5.

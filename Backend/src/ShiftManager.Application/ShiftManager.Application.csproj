@@ -2,4 +2,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ShiftManager.Domain\ShiftManager.Domain.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Mediator.Abstractions" Version="3.0.2" />
+  </ItemGroup>
 </Project>

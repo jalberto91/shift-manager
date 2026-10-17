@@ -1,6 +1,11 @@
 # Contrato de errores
 
-Formato: RFC 7807 Problem Details, siempre con `traceId`. Se completa en la Fase 2 al implementar el middleware (ADR-04, ADR-10).
+Formato: RFC 7807 Problem Details, siempre con `traceId` (ADR-04, ADR-10).
+
+- `title` es el nombre estándar del status HTTP, en inglés (`Bad Request`, `Not Found`, `Conflict`). Es una etiqueta técnica, no texto de pantalla.
+- Las claves de `errors` son códigos de negocio estables en inglés (contrato): el front se guía por ellas.
+- `detail` y los mensajes dentro de `errors` van en español: son el texto que puede verse el usuario (P16).
+- Una respuesta puede traer varios errores en `errors`; el primero decide el status y el `detail`.
 
 | Situación | HTTP | Notas |
 |---|---|---|
@@ -9,16 +14,40 @@ Formato: RFC 7807 Problem Details, siempre con `traceId`. Se completa en la Fase
 | Conflicto de estado (solape de turnos, borrar colaborador con turnos) | 409 | Código `shift.overlap` (con `conflictingShiftId`) / `collaborator.hasShifts` |
 | Error inesperado | 500 | Mensaje genérico; el detalle solo va a los logs |
 
-Ejemplo (a confirmar con respuestas reales):
+Respuestas reales verificadas (los mensajes son de ejemplo):
 
 ```json
+// 409
 {
-  "type": "https://httpstatuses.io/409",
-  "title": "Conflicto",
+  "type": "https://tools.ietf.org/html/rfc9110#section-15.5.10",
+  "title": "Conflict",
   "status": 409,
-  "detail": "El turno se solapa con otro del mismo colaborador.",
-  "traceId": "00-...",
-  "errors": { "shift.overlap": ["..."] },
-  "conflictingShiftId": "..."
+  "detail": "El turno se solapa",
+  "errors": { "shift.overlap": ["El turno se solapa"] },
+  "traceId": "7a8c2ee0b5f2481c8b4528007e920ad9",
+  "conflictingShiftId": "00000000-0000-0000-0000-000000000000"
+}
+
+// 400 con varios errores
+{
+  "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+  "title": "Bad Request",
+  "status": 400,
+  "detail": "Nombre requerido",
+  "errors": {
+    "collaborator.name": ["Nombre requerido"],
+    "collaborator.email": ["Email inválido"]
+  },
+  "traceId": "b67675ebba89d7f2c7ae39f192a124c1"
+}
+
+// 500: sin detalle interno
+{
+  "type": "https://tools.ietf.org/html/rfc9110#section-15.6.1",
+  "title": "An error occurred while processing your request.",
+  "status": 500,
+  "traceId": "de08b5631b56fc8f51d72e05bb3ff549"
 }
 ```
+
+Rutas inexistentes devuelven `404` con `application/problem+json` y `traceId`.
