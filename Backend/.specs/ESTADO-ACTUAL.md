@@ -9,7 +9,7 @@ Iteraciones chicas. Al terminar cada una: **parar**, mostrar archivos tocados, s
 - Cada UC: (a) dominio + reglas + tests unitarios · (b) endpoint + infraestructura + docs/api + .http
 
 ## ⏭️ Próximo paso
-Iteración 9 hecha y verificada con `docker compose up` (sin commitear). Fase 2 completa. Esperando tu "seguí" para **UC-01 (a)**: abrir `.specs/use-cases/_TEMPLATE-UC.md`, aplicar la Tarea 0 del skill `implement-use-case` y redactar `UC-01-listar-colaboradores.md`.
+UC-01 (a) hecho (sin commitear): spec, `Collaborator` + `CollaboratorErrors` y 22 tests nuevos. Esperando tu "seguí" para **UC-01 (b)**: abrir `.specs/use-cases/UC-01-listar-colaboradores.md` (sección Design) y construir `ListCollaborators` + `ICollaboratorRepository`, la configuración EF, la primera migración con semilla, el controller y `docs/api` + `.http`. Ahí se agregan `Microsoft.EntityFrameworkCore.Design` y `dotnet-ef` 9.x local.
 
 Decisión: **no hay migraciones hasta que existan entidades**. La primera migración (con `Collaborator` y la semilla) llega en UC-01; en ese momento se agregan `Microsoft.EntityFrameworkCore.Design` (en `Api`) y `dotnet-ef` 9.x como herramienta local (`dotnet-tools.json`), con su `license-check` ya hecho (MIT).
 

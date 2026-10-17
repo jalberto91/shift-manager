@@ -4,7 +4,7 @@ Las entidades **emergen de los casos de uso**; aquí solo se indica qué spec de
 
 | Entidad / VO | Definida en | Estado |
 |---|---|---|
-| Colaborador | UC-01 (lectura) y UC-02 (invariantes) | por definir |
-| Turno | UC-03 | por definir |
+| Collaborator (`Domain/Collaborators/`) | UC-01 (creación e invariantes); UC-02 (unicidad, edición, baja) | creada, invariantes de creación hechas |
+| Turno (`Shift`) | UC-03 | por definir |
 | Festivo (modelo de lectura, no persistido) | UC-05 | por definir |
 | Informe de importación (modelo de aplicación) | UC-06 | por definir |
