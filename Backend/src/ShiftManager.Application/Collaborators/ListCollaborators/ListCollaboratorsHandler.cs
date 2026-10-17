@@ -11,8 +11,6 @@ public sealed class ListCollaboratorsHandler(ICollaboratorRepository collaborato
     {
         var list = await collaborators.ListAsync(cancellationToken);
 
-        return list
-            .Select(c => new CollaboratorDto(c.Id, c.Name, c.Email, c.CountryCode))
-            .ToList();
+        return list.Select(CollaboratorDto.From).ToList();
     }
 }

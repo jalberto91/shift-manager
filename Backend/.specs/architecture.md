@@ -99,6 +99,7 @@ Dependencias: `Domain ← Application ← Infrastructure ← Api` (Api compone t
 - **Alternativas**: llamar sin caché; fallar el listado si la API cae.
 - **Decisión**: `HttpClient` tipado, timeout corto, reintentos acotados (resilience handler), caché por país+año (`IMemoryCache`), y **degradación**: si falla, el listado responde igual con `holiday = unknown`. Validación de país de un colaborador: si Nager.Date responde, se valida contra `AvailableCountries`; si no responde, se acepta el alta cuando el código tiene formato ISO alfa-2 (dos letras mayúsculas) y se loguea un warning. Un fallo externo no bloquea el alta.
 - **Consecuencias**: (+) el listado nunca depende de la API externa. (−) un festivo puede mostrarse "desconocido" hasta el siguiente acierto; los fallos no se cachean.
+- **Ajuste (UC-02)**: el catálogo de países usa timeout de 5 s y degrada a `null` sin reintentos, con la lista de `AvailableCountries` cacheada 24 h; el resilience handler se aplica al cliente de festivos.
 - **Estado**: Aceptado
 
 ### ADR-10 · Regla de solape y fechas

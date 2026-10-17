@@ -46,22 +46,23 @@ Casos límite:
 
 **Capas previstas**
 - Application: `CreateCollaborator`, `UpdateCollaborator`, `DeactivateCollaborator` (Command + Handler cada uno, reutilizan `CollaboratorDto`); puertos `ICountryCatalog` y ampliación de `ICollaboratorRepository` (`GetByIdAsync`, `EmailExistsAsync`, `Add`, `SaveChangesAsync`); `ListAsync` filtra `IsActive`.
-- Infrastructure: columna `IsActive` e índice único en `CollaboratorConfiguration`, migración, `NagerDateCountryCatalog` (iteración c).
+- Infrastructure: columna `IsActive` e índice único en `CollaboratorConfiguration`, migración, `NagerDateCountryCatalog` (iteración b1).
 - Api: tres acciones en `CollaboratorsController`.
 
 **Decisiones y supuestos**
 - Baja lógica en lugar de borrado físico (ADR-11); sustituye al `collaborator.hasShifts` de los documentos iniciales.
 - El email de un colaborador dado de baja sigue ocupado: simplifica el índice (sin filtro parcial) y evita ambigüedad al importar por email.
+- `PUT` solo afecta a colaboradores activos: sobre uno dado de baja responde `404` (el cliente solo conoce ids del listado, que filtra activos). `DELETE` sigue siendo idempotente.
 - Corregido: el supuesto inicial de borrado físico con `409` si había turnos queda descartado.
 
 ## Tasks
 - [x] Domain: `IsActive`, `Update`, `Deactivate`, errores nuevos (iteración a)
-- [ ] Application: casos de uso y puertos (iteración b)
+- [x] Application: casos de uso y puertos (iteración b1)
 - [x] Infrastructure: columna `IsActive` con `HasDefaultValue(true)` y migración `AddCollaboratorIsActive` (iteración a: sin ella EF 9 aborta el arranque por cambios de modelo pendientes, y el valor por defecto evita que los colaboradores existentes queden inactivos)
-- [ ] Infrastructure: índice único de email, repositorio (iteración b); Nager.Date (iteración c)
-- [ ] Api: acciones de `CollaboratorsController` (iteración b)
+- [x] Infrastructure: índice único de email, repositorio y `NagerDateCountryCatalog` (iteración b1: el contenedor de DI valida los handlers y exige la implementación de `ICountryCatalog` para arrancar)
+- [ ] Api: acciones de `CollaboratorsController` (iteración b2; sin `GET /{id}`, el `Location` se arma con la ruta del recurso)
 - [x] Tests: `Update`, `Deactivate`, `IsActive` inicial (dominio, iteración a)
-- [ ] Tests: handlers (iteración b) y degradación de Nager.Date (iteración c)
+- [x] Tests: handlers y catálogo de países con degradación de Nager.Date (iteración b1)
 - [ ] Docs: `docs/api/ENDPOINTS.md` y `.http` con respuestas reales (iteración c)
 
 ## Verificación

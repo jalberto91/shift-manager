@@ -32,7 +32,9 @@ try
     builder.Services.AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped);
     builder.Services.AddInfrastructure(
         builder.Configuration.GetConnectionString("Default")
-        ?? throw new InvalidOperationException("Missing connection string 'ConnectionStrings:Default'."));
+        ?? throw new InvalidOperationException("Missing connection string 'ConnectionStrings:Default'."),
+        builder.Configuration["NagerDate:BaseUrl"]
+        ?? throw new InvalidOperationException("Missing setting 'NagerDate:BaseUrl'."));
 
     var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
     builder.Services.AddCors(options =>

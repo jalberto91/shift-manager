@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\ShiftManager.Domain\ShiftManager.Domain.csproj" />
     <ProjectReference Include="..\..\src\ShiftManager.Application\ShiftManager.Application.csproj" />
+    <ProjectReference Include="..\..\src\ShiftManager.Infrastructure\ShiftManager.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

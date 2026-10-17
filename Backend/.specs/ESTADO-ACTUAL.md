@@ -4,7 +4,7 @@
 Iteraciones chicas. Al terminar cada una: **parar**, mostrar archivos tocados, sugerir mensaje de commit (Conventional Commits, **en inglés**, con scope) y **esperar "seguí"**. El usuario commitea a mano. Nunca encadenar dos iteraciones sin "seguí". Si una crece más de lo previsto, cortarla en dos antes de seguir.
 
 ## ⏭️ Próximo paso
-**UC-02 (b)**: abrir `use-cases/UC-02-gestionar-colaboradores.md` (sección Design). Casos de uso `Create/Update/DeactivateCollaborator`, puertos (`ICountryCatalog`, ampliación de `ICollaboratorRepository`), `ListAsync` filtrando `IsActive`, índice único de email con migración (verificar que no choque con la semilla), endpoints y tests de handlers. Luego (c): cliente Nager.Date, `docs/api/ENDPOINTS.md`, `.http` y E2E.
+**UC-02 (b2)**: tres acciones en `CollaboratorsController` (`POST` 201 + `Location` armado con la ruta, `PUT` 200, `DELETE` 204) usando `ToProblem`; sin `GET /{id}`. Luego (c): `docs/api/ENDPOINTS.md`, `.http` y E2E. Los reintentos de ADR-09 (resilience) quedan para el cliente de festivos.
 
 ## Dónde estamos
 - Fases 1 y 2, **UC-01 completo** y **UC-02 (a)** commiteados (último: `9fd35c4`). Árbol limpio.
