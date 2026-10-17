@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <ItemGroup>
+    <ProjectReference Include="..\ShiftManager.Application\ShiftManager.Application.csproj" />
+    <ProjectReference Include="..\ShiftManager.Infrastructure\ShiftManager.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

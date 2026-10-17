@@ -1,0 +1,9 @@
+CLAUDE.md
+.claude/
+.specs/
+docs/
+**/bin/
+**/obj/
+.vs/
+*.user
+.git

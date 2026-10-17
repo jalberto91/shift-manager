@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\ShiftManager.Domain\ShiftManager.Domain.csproj" />
+  </ItemGroup>
+</Project>
