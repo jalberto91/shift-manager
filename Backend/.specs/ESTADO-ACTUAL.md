@@ -4,12 +4,12 @@
 Iteraciones chicas. Al terminar cada una: **parar**, mostrar archivos tocados, sugerir mensaje de commit (Conventional Commits, **en inglés**, con scope) y **esperar "seguí"**. El usuario commitea a mano. Nunca encadenar dos iteraciones sin "seguí". Si una crece más de lo previsto, cortarla en dos antes de seguir.
 
 ## ⏭️ Próximo paso
-**UC-02 (b)**: casos de uso `Create/Update/DeactivateCollaborator`, puertos (`ICountryCatalog`, ampliación de `ICollaboratorRepository`), `IsActive` + índice único de email con migración, endpoints y tests de handlers. Luego (c): cliente Nager.Date, docs y E2E. Spec: `use-cases/UC-02-gestionar-colaboradores.md`.
+**UC-02 (b)**: abrir `use-cases/UC-02-gestionar-colaboradores.md` (sección Design). Casos de uso `Create/Update/DeactivateCollaborator`, puertos (`ICountryCatalog`, ampliación de `ICollaboratorRepository`), `ListAsync` filtrando `IsActive`, índice único de email con migración (verificar que no choque con la semilla), endpoints y tests de handlers. Luego (c): cliente Nager.Date, `docs/api/ENDPOINTS.md`, `.http` y E2E.
 
 ## Dónde estamos
-- Fases 1 y 2 y **UC-01 completo** commiteados (último: `2a8b8cd`). Árbol limpio.
-- Build sin warnings, 27 tests verdes, `docker compose up` verificado (API en `localhost:5080`, BD en `127.0.0.1:5433`).
-- Existe la migración `InitialCreate` (tabla `collaborators`) y la semilla de 5 colaboradores. `dotnet-ef` 9.0.21 es herramienta local (`.config/dotnet-tools.json`): `dotnet dotnet-ef`.
+- Fases 1 y 2, **UC-01 completo** y **UC-02 (a)** commiteados (último: `9fd35c4`). Árbol limpio.
+- Build sin warnings, 31 tests verdes. `docker compose up` verificado antes de UC-02 (API en `localhost:5080`, BD en `127.0.0.1:5433`); la migración `AddCollaboratorIsActive` aún no se ejercitó con Docker.
+- Existen las migraciones `InitialCreate` (tabla `collaborators`) y `AddCollaboratorIsActive`, y la semilla de 5 colaboradores. `dotnet-ef` 9.0.21 es herramienta local (`.config/dotnet-tools.json`): `dotnet dotnet-ef`.
 - Migrar con `dotnet dotnet-ef migrations add <Name> --project src/ShiftManager.Infrastructure --startup-project src/ShiftManager.Api --output-dir Persistence/Migrations`. El `HostAbortedException` que imprime es ruido normal de las herramientas.
 
 ## Decisiones vigentes (las que no son obvias leyendo el código)
@@ -23,7 +23,7 @@ Iteraciones chicas. Al terminar cada una: **parar**, mostrar archivos tocados, s
 - pgAdmin de escritorio en Windows: host `127.0.0.1` y `GSS encryption mode = disable` (ver skill `verify`).
 
 ## Bloque en curso
-UC-02 (a) hecho, sin commitear: spec, ADR-11 (baja lógica), dominio (`IsActive`, `Update`, `Deactivate`, errores), migración `AddCollaboratorIsActive` y tests. Pendiente en (b): `ListAsync` debe filtrar `IsActive` e índice único de email (verificar que la migración no choque con los datos semilla). Build sin warnings, 31 tests verdes.
+UC-02 en curso: (a) cerrada y archivada; (b) y (c) pendientes. Ninguna iteración abierta.
 
 ## Abierto / pendientes con terceros
 - ADR-08 (Excel: ClosedXML vs MiniExcel) pendiente de `license-check`.
@@ -47,5 +47,6 @@ UC-02 (a) hecho, sin commitear: spec, ADR-11 (baja lógica), dominio (`IsActive`
 - [ ] Revisión contra "qué valoran" (`00-requisitos.md` §2)
 
 ## Cerrado recientemente
+- 2026-10-17 · UC-02 (a): spec, ADR-11, dominio de edición y baja lógica, migración `IsActive` → [historial](historial/2026-10-17-uc02-a-dominio.md)
 - 2026-10-17 · UC-01 (b): query, repositorio, migración inicial, semilla y endpoint → [historial](historial/2026-10-17-uc01-listar-colaboradores.md)
 - 2026-10-17 · Andamiaje SDD, esqueleto técnico y UC-01 (a) → [historial](historial/2026-10-17-andamiaje-y-esqueleto.md)
