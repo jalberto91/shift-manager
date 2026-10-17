@@ -9,7 +9,7 @@ Iteraciones chicas. Al terminar cada una: **parar**, mostrar archivos tocados, s
 - Cada UC: (a) dominio + reglas + tests unitarios · (b) endpoint + infraestructura + docs/api + .http
 
 ## ⏭️ Próximo paso
-Iteración 8 hecha y verificada contra PostgreSQL 17 (sin commitear). Esperando tu "seguí" para la **iteración 9**: Dockerfile del backend + `../docker-compose.yml` (BD + API).
+Iteración 9 hecha y verificada con `docker compose up` (sin commitear). Fase 2 completa. Esperando tu "seguí" para **UC-01 (a)**: abrir `.specs/use-cases/_TEMPLATE-UC.md`, aplicar la Tarea 0 del skill `implement-use-case` y redactar `UC-01-listar-colaboradores.md`.
 
 Decisión: **no hay migraciones hasta que existan entidades**. La primera migración (con `Collaborator` y la semilla) llega en UC-01; en ese momento se agregan `Microsoft.EntityFrameworkCore.Design` (en `Api`) y `dotnet-ef` 9.x como herramienta local (`dotnet-tools.json`), con su `license-check` ya hecho (MIT).
 
@@ -19,7 +19,7 @@ Decisión: **no hay migraciones hasta que existan entidades**. La primera migrac
 - Sin código de negocio todavía.
 
 ## Pendiente para la iteración 9 (Docker)
-El compose debe fijar `Cors__AllowedOrigins__0` con el origen del front en contenedor; `appsettings.json` solo trae `http://localhost:4200`.
+Hecho: el compose fija `Cors__AllowedOrigins__0=http://localhost:4200`. Cuando el front entre al compose, ajustar ese origen al puerto que publique.
 
 ## Bloque en curso
 Revisión de iteraciones 1-5.

@@ -17,7 +17,11 @@ Completar a medida que se descubra. Valores marcados "a confirmar" se fijan en l
 
 ## Opción B · Docker (R8: entorno completo con un comando)
 - Desde `shift-manager/`: `docker compose up --build -d`; logs: `docker compose logs -f api`.
-- Verificar: `/health`, la UI de OpenAPI (ruta a confirmar) y los datos semilla.
+- La API queda en `http://localhost:5080` (contenedor 8080); la BD no se publica al host.
+- Verificar: `/health` (`Healthy`), `/scalar/v1` (200), `/openapi/v1.json` y, desde UC-01, los datos semilla.
+- Esperar: reintentar `curl -sf http://localhost:5080/health` hasta que responda (la API espera al healthcheck de la BD).
+- Ruido esperado en el primer arranque: un `ERR Failed executing DbCommand` sobre `__EFMigrationsHistory` (EF la consulta antes de crearla). No es un fallo.
+- BD desde un cliente en el host: `127.0.0.1:5433`, base/usuario/contraseña `shiftmanager`. En pgAdmin de escritorio (Windows) usar host `127.0.0.1` y, en Parameters, `GSS encryption mode = disable`; sin eso la conexión cae con `access violation writing 0x0000000000000000` (fallo de `libpq`, no de la BD).
 - Apagar: `docker compose down` (con `-v` para resetear la BD).
 
 ## Autenticación
