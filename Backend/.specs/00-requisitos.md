@@ -87,7 +87,9 @@ API REST en **.NET 9** + front Angular para gestionar turnos de trabajo de colab
 
 ## 7. Decisiones tomadas en la Fase 0 (sesión de arranque)
 - Conflicto de solape → **409 Conflict** + Problem Details (ADR-10).
-- Fecha y horas del turno → `DateOnly` + `TimeOnly` sin zona (coherente con P3/P12).
+- Fecha y horas del turno → `DateOnly` + `TimeOnly` sin zona (coherente con P3/P12). En el JSON: fecha `yyyy-MM-dd`, hora `HH:mm`.
+- Códigos de error de negocio en inglés (contrato de la API): `shift.overlap`, `collaborator.email`, etc.
+- Validación de país (P4) con Nager.Date caído → se acepta el alta si el código tiene formato ISO alfa-2 (dos letras mayúsculas) y se loguea un warning; si responde, se valida contra `AvailableCountries` (ADR-09). Un fallo externo no bloquea el alta.
 
 ## 8. Repositorio
 Monorepo en `shift-manager/`: `Backend/`, `FrontEnd/`, `docker-compose.yml`, `README.md`. Commits con scope: `feat(backend): …`, hechos por la persona, uno por paso.

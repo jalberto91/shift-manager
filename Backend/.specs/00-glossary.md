@@ -10,5 +10,5 @@
 | Festivo desconocido | Estado cuando Nager.Date no respondió: el listado sigue funcionando. |
 | País | Código ISO 3166-1 alfa-2 (`ES`, `AR`, `BR`). |
 | Informe de importación | Resultado del import: filas importadas y filas fallidas con su motivo (número de fila + código). |
-| Código de negocio | Identificador estable de un error, p. ej. `turno.solape`, `colaborador.email`. |
+| Código de negocio | Identificador estable de un error, p. ej. `shift.overlap`, `collaborator.email`. En inglés: son parte del contrato de la API. |
 | Datos semilla | Colaboradores de varios países cargados al arrancar para que la app sea usable. |

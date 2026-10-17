@@ -41,7 +41,7 @@ Antes de comentar, renombrar. Solo queda lo que el código **no puede** decir (u
 2. `IRepository<T>` genérico.
 3. Entidad EF como DTO de la API.
 4. `OnModelCreating` gigante con Fluent inline.
-5. Eventos tipo `EntityUpdated` (deben ser hechos de negocio en pasado: `TurnoCreado`).
+5. Eventos tipo `EntityUpdated` (deben ser hechos de negocio en pasado: `ShiftCreated`).
 6. Excepciones para flujo de negocio.
 
 ## Git — regla dura
