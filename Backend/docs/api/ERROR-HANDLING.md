@@ -11,7 +11,7 @@ Formato: RFC 7807 Problem Details, siempre con `traceId` (ADR-04, ADR-10).
 |---|---|---|
 | Validación / regla de negocio | 400 | `errors` keyed por código estable, p. ej. `collaborator.email` |
 | Recurso inexistente | 404 | |
-| Conflicto de estado (solape de turnos, borrar colaborador con turnos) | 409 | Código `shift.overlap` (con `conflictingShiftId`) / `collaborator.hasShifts` |
+| Conflicto de estado (solape de turnos, email ya usado) | 409 | Código `shift.overlap` (con `conflictingShiftId`) / `collaborator.email-taken` |
 | Error inesperado | 500 | Mensaje genérico; el detalle solo va a los logs |
 
 Respuestas reales verificadas (los mensajes son de ejemplo):

@@ -83,4 +83,53 @@ public class CollaboratorTests
             [CollaboratorErrors.InvalidName, CollaboratorErrors.InvalidEmail, CollaboratorErrors.InvalidCountry],
             result.Errors);
     }
+
+    [Fact]
+    public void Create_starts_active()
+    {
+        var collaborator = Collaborator.Create("Ana", "ana@example.com", "ES").Value;
+
+        Assert.True(collaborator.IsActive);
+    }
+
+    [Fact]
+    public void Update_replaces_and_normalizes_every_field_keeping_the_id()
+    {
+        var collaborator = Collaborator.Create("Ana", "ana@example.com", "ES").Value;
+        var id = collaborator.Id;
+
+        var result = collaborator.Update("  Bea Gomez ", " Bea@Example.COM ", " ar ");
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(id, collaborator.Id);
+        Assert.Equal("Bea Gomez", collaborator.Name);
+        Assert.Equal("bea@example.com", collaborator.Email);
+        Assert.Equal("AR", collaborator.CountryCode);
+    }
+
+    [Fact]
+    public void Update_reports_every_invalid_field_and_changes_nothing()
+    {
+        var collaborator = Collaborator.Create("Ana", "ana@example.com", "ES").Value;
+
+        var result = collaborator.Update("", "nope", "XYZ");
+
+        Assert.Equal(
+            [CollaboratorErrors.InvalidName, CollaboratorErrors.InvalidEmail, CollaboratorErrors.InvalidCountry],
+            result.Errors);
+        Assert.Equal("Ana", collaborator.Name);
+        Assert.Equal("ana@example.com", collaborator.Email);
+        Assert.Equal("ES", collaborator.CountryCode);
+    }
+
+    [Fact]
+    public void Deactivate_is_idempotent()
+    {
+        var collaborator = Collaborator.Create("Ana", "ana@example.com", "ES").Value;
+
+        collaborator.Deactivate();
+        collaborator.Deactivate();
+
+        Assert.False(collaborator.IsActive);
+    }
 }

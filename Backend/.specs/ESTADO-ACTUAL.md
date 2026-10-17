@@ -4,7 +4,7 @@
 Iteraciones chicas. Al terminar cada una: **parar**, mostrar archivos tocados, sugerir mensaje de commit (Conventional Commits, **en inglés**, con scope) y **esperar "seguí"**. El usuario commitea a mano. Nunca encadenar dos iteraciones sin "seguí". Si una crece más de lo previsto, cortarla en dos antes de seguir.
 
 ## ⏭️ Próximo paso
-**UC-02** (alta, edición y baja de colaboradores): crear su spec desde `_TEMPLATE-UC.md`. Incluye unicidad de email (índice único, P5) y validación del país contra Nager.Date (ADR-09).
+**UC-02 (b)**: casos de uso `Create/Update/DeactivateCollaborator`, puertos (`ICountryCatalog`, ampliación de `ICollaboratorRepository`), `IsActive` + índice único de email con migración, endpoints y tests de handlers. Luego (c): cliente Nager.Date, docs y E2E. Spec: `use-cases/UC-02-gestionar-colaboradores.md`.
 
 ## Dónde estamos
 - Fases 1 y 2 y **UC-01 completo** commiteados (último: `2a8b8cd`). Árbol limpio.
@@ -23,11 +23,11 @@ Iteraciones chicas. Al terminar cada una: **parar**, mostrar archivos tocados, s
 - pgAdmin de escritorio en Windows: host `127.0.0.1` y `GSS encryption mode = disable` (ver skill `verify`).
 
 ## Bloque en curso
-Ninguno. UC-02 todavía sin spec.
+UC-02 (a) hecho, sin commitear: spec, ADR-11 (baja lógica), dominio (`IsActive`, `Update`, `Deactivate`, errores), migración `AddCollaboratorIsActive` y tests. Pendiente en (b): `ListAsync` debe filtrar `IsActive` e índice único de email (verificar que la migración no choque con los datos semilla). Build sin warnings, 31 tests verdes.
 
 ## Abierto / pendientes con terceros
 - ADR-08 (Excel: ClosedXML vs MiniExcel) pendiente de `license-check`.
-- P5: email normalizado a minúsculas + índice único; se detalla en UC-02.
+- P5: email normalizado a minúsculas + índice único; el índice incluye inactivos (ADR-11), se crea en UC-02 (b).
 - Cuando el front entre al compose, ajustar `Cors__AllowedOrigins__0` al puerto que publique.
 
 ## Checklist de cierre de UC-02 (Paso 4 de `implement-use-case`)

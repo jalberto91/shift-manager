@@ -16,5 +16,6 @@ public sealed class CollaboratorConfiguration : IEntityTypeConfiguration<Collabo
         builder.Property(c => c.Name).HasMaxLength(Collaborator.NameMaxLength).IsRequired();
         builder.Property(c => c.Email).HasMaxLength(Collaborator.EmailMaxLength).IsRequired();
         builder.Property(c => c.CountryCode).HasMaxLength(Collaborator.CountryCodeLength).IsFixedLength().IsRequired();
+        builder.Property(c => c.IsActive).HasDefaultValue(true);
     }
 }
