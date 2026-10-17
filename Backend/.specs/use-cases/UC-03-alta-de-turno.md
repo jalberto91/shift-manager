@@ -39,7 +39,7 @@ Casos límite de la regla (cada uno es un test):
 **Regla fuera del dominio** (necesita datos, vive en el handler):
 1. El dominio valida la forma (`Create`).
 2. El colaborador existe y está activo: `ICollaboratorRepository.GetByIdAsync` (ya existe).
-3. Solape: el puerto nuevo `IShiftRepository.ListByCollaboratorAndDateAsync(collaboratorId, date, excludingId, ct)` devuelve los turnos de ese día y el handler aplica `OverlapsWith` en memoria. El SQL solo acota por colaborador y día; la regla no se duplica en una consulta. `excludingId` queda para la edición de UC-04 y el import de UC-06 reutiliza `OverlapsWith` contra los turnos del archivo.
+3. Solape: el puerto nuevo `IShiftRepository.ListByCollaboratorAndDateAsync(collaboratorId, date, excludingId, ct)` devuelve los turnos de ese día y el handler aplica `OverlapsWith` en memoria. El SQL solo acota por colaborador y día; la regla no se duplica en una consulta. UC-04 agregará `excludingId` al puerto cuando edite (hoy sería un parámetro sin uso) y el import de UC-06 reutiliza `OverlapsWith` contra los turnos del archivo.
 
 **Capas previstas**
 - Domain: `Shift`, `ShiftErrors`.
@@ -57,8 +57,8 @@ Casos límite de la regla (cada uno es un test):
 ## Tasks
 - [x] Domain: `Shift`, `ShiftErrors` y `OverlapsWith` (iteración a; `shift.collaborator-unavailable` se agrega en (b), donde se usa)
 - [x] Tests: dominio, casos límite de la regla (iteración a)
-- [ ] Application: `CreateShift`, `ShiftDto` y puerto `IShiftRepository` (iteración b)
-- [ ] Tests: handler con fakes (iteración b)
+- [x] Application: `CreateShift`, `ShiftDto` y puerto `IShiftRepository` (iteración b; `shift.collaborator-unavailable` agregado aquí)
+- [x] Tests: handler con fakes (iteración b)
 - [ ] Infrastructure: configuración, repositorio, migración `AddShifts` (iteración c)
 - [ ] Api: `ShiftsController` y `CreateShiftRequest` (iteración c)
 - [ ] Docs: `docs/api/ENDPOINTS.md` y `.http` con respuestas reales (iteración c)
