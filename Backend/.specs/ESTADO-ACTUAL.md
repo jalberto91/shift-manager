@@ -1,7 +1,7 @@
 # Estado actual (handoff vivo)
 
 ## Forma de trabajo (regla)
-Iteraciones chicas. Al terminar cada una: **parar**, mostrar archivos tocados, sugerir mensaje de commit (Conventional Commits, español, con scope) y **esperar "seguí"**. El usuario commitea a mano. Nunca encadenar dos iteraciones sin "seguí". Si una crece más de lo previsto, cortarla en dos antes de seguir.
+Iteraciones chicas. Al terminar cada una: **parar**, mostrar archivos tocados, sugerir mensaje de commit (Conventional Commits, **en inglés**, con scope) y **esperar "seguí"**. El usuario commitea a mano. Nunca encadenar dos iteraciones sin "seguí". Si una crece más de lo previsto, cortarla en dos antes de seguir.
 
 ## Corte de iteraciones
 - Fase 1: (1) `docs(sdd)` requisitos + glosario · (2) `docs(sdd)` architecture.md + ADR-01…10 · (3) `docs(sdd)` CLAUDE.md + ESTADO-ACTUAL + historial/README + plantilla UC · (4) `chore(sdd)` skills · (5) `chore(sdd)` comandos

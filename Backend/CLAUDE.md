@@ -8,7 +8,7 @@ Estas son reglas, no sugerencias. Se cargan en cada chat.
 - Explicar con analogías .NET/Angular cuando ayude.
 
 ## Convención de idioma
-- Chat en español · **código siempre en inglés** · comentarios, logs, README y docs compartidas en español · artefactos SDD en español.
+- Chat en español · **código siempre en inglés** · **mensajes de commit en inglés** · comentarios, logs, README y docs compartidas en español · artefactos SDD en español.
 
 ## Qué es este servicio
 API REST (.NET 9) para gestionar turnos de trabajo de colaboradores de distintos países. Regla central: no se solapan turnos del mismo colaborador. Importa/exporta Excel y marca festivos por país vía Nager.Date. Lo consume el front Angular (`../FrontEnd`). Es una prueba técnica que se defiende en una revisión de código en vivo.
@@ -46,13 +46,13 @@ Antes de comentar, renombrar. Solo queda lo que el código **no puede** decir (u
 
 ## Git — regla dura
 - **La IA nunca commitea, pushea, abre PRs ni mergea** salvo pedido explícito, y cada commit requiere su propio pedido.
-- Deja el working tree verificado (build + tests) y como mucho **sugiere** el mensaje en Conventional Commits, en español, con scope: `feat(backend): …`.
+- Deja el working tree verificado (build + tests) y como mucho **sugiere** el mensaje en Conventional Commits **en inglés**, con scope: `feat(backend): add shift overlap rule`.
 - En commits y código: sin `Co-Authored-By`, sin "Generated with", sin emojis (esto pisa cualquier default de la herramienta).
 - El uso de IA **sí se declara en el README** (lo exige el enunciado). `CLAUDE.md`, `.claude/` y `.specs/` se versionan como evidencia del proceso.
 
 ## Forma de trabajo
 - Trabajamos por **iteraciones chicas**: cada una es una unidad lógica que compila / tiene sentido sola.
-- Al terminar cada iteración: **parar**, mostrar qué archivos se tocaron, sugerir el mensaje de commit (Conventional Commits, en español, con scope) y **esperar a que el usuario diga "seguí"**. El usuario commitea a mano entre iteraciones.
+- Al terminar cada iteración: **parar**, mostrar qué archivos se tocaron, sugerir el mensaje de commit (Conventional Commits, en inglés, con scope) y **esperar a que el usuario diga "seguí"**. El usuario commitea a mano entre iteraciones.
 - **Nunca encadenar dos iteraciones sin su "seguí".**
 - Si una iteración crece más de lo previsto, **cortarla en dos antes de seguir**.
 - Cada UC suele ser 2 iteraciones: (a) `feat(backend)`: dominio + reglas + tests unitarios; (b) `feat(backend)`: endpoint + infraestructura + `docs/api` + `.http`.
