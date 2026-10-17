@@ -44,6 +44,7 @@ try
     var app = builder.Build();
 
     await app.Services.ApplyMigrationsAsync();
+    await app.Services.SeedAsync();
 
     app.UseExceptionHandler();
     app.UseStatusCodePages();

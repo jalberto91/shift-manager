@@ -4,7 +4,7 @@ Contrato que lee el front. Se actualiza al cerrar cada UC. Las rutas van en ingl
 
 | UC | Método | Ruta | Descripción | Estado |
 |---|---|---|---|---|
-| UC-01 | GET | `/api/collaborators` | Listar colaboradores | pendiente |
+| UC-01 | GET | `/api/collaborators` | Listar colaboradores | hecho |
 | UC-02 | POST/PUT/DELETE | `/api/collaborators[/{id}]` | Alta, edición, baja | pendiente |
 | UC-03 | POST | `/api/shifts` | Alta de turno (409 si solapa) | pendiente |
 | UC-04 | GET/PUT/DELETE | `/api/shifts[/{id}]` | Listar con rango de fechas, leer, editar, borrar | pendiente |
@@ -14,3 +14,13 @@ Contrato que lee el front. Se actualiza al cerrar cada UC. Las rutas van en ingl
 | — | GET | `/health` | Health check (incluye la BD) | hecho |
 
 Las rutas son provisionales hasta cerrar cada UC.
+
+## UC-01 · GET /api/collaborators
+
+Devuelve `200` con todos los colaboradores, ordenados por nombre y luego email. Sin parámetros. Ejemplos en [collaborators.http](collaborators.http).
+
+```json
+[
+  { "id": "<guid>", "name": "Ana Pérez", "email": "ana.perez@example.com", "countryCode": "ES" }
+]
+```

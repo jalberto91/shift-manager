@@ -1,0 +1,12 @@
+@baseUrl = http://localhost:5080
+
+### UC-01 · List collaborators
+# Response 200 (ordered by name, then email; ids are generated when the database is created):
+# [
+#   { "id": "<guid>", "name": "Ana Pérez", "email": "ana.perez@example.com", "countryCode": "ES" },
+#   { "id": "<guid>", "name": "Bruno Silva", "email": "bruno.silva@example.com", "countryCode": "BR" },
+#   { "id": "<guid>", "name": "Carla Gómez", "email": "carla.gomez@example.com", "countryCode": "AR" },
+#   { "id": "<guid>", "name": "Diego Hernández", "email": "diego.hernandez@example.com", "countryCode": "MX" },
+#   { "id": "<guid>", "name": "Elena Rossi", "email": "elena.rossi@example.com", "countryCode": "IT" }
+# ]
+GET {{baseUrl}}/api/collaborators

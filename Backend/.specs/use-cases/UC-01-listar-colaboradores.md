@@ -45,15 +45,15 @@ Casos límite:
 - La semilla usa códigos de país reales y válidos en Nager.Date (`ES`, `AR`, `BR`, `MX`...), para que UC-05 encuentre festivos.
 
 ## Tasks
-- [ ] Domain: `Collaborator`, `CollaboratorErrors`
-- [ ] Application: `ListCollaborators`, `ICollaboratorRepository` (iteración b)
-- [ ] Infrastructure: configuración, repositorio, migración y semilla (iteración b)
-- [ ] Api: `CollaboratorsController` (iteración b)
+- [x] Domain: `Collaborator`, `CollaboratorErrors`
+- [x] Application: `ListCollaborators`, `ICollaboratorRepository` (iteración b)
+- [x] Infrastructure: configuración, repositorio, migración y semilla (iteración b)
+- [x] Api: `CollaboratorsController` (iteración b)
 - [x] Tests: invariantes y normalización de `Collaborator.Create`
-- [ ] Docs: `docs/api/ENDPOINTS.md` y `.http` con respuestas reales (iteración b)
+- [x] Docs: `docs/api/ENDPOINTS.md` y `.http` con respuestas reales (iteración b)
 
 ## Verificación
-Pendiente (iteración b): `docker compose up --build -d`, `GET /api/collaborators` con la lista semilla, y la UI de OpenAPI.
+Hecha: `docker compose up --build -d` aplica la migración, carga 5 colaboradores y `GET /api/collaborators` los devuelve ordenados (200). EF mapea el constructor privado y las propiedades de solo lectura sin configuración extra.
 
 ## TBDs
 1. Resuelto: la semilla se aplica solo si la tabla está vacía, con un seeder (no `HasData`), porque `Collaborator` genera su `Guid` en `Create` y la semilla debe pasar por sus invariantes. Un dato semilla inválido hace fallar el arranque a la vista.
