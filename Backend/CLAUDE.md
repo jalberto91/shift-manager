@@ -8,7 +8,7 @@ Estas son reglas, no sugerencias. Se cargan en cada chat.
 - Explicar con analogías .NET/Angular cuando ayude.
 
 ## Convención de idioma
-- Chat en español · **código siempre en inglés** · **mensajes de commit en inglés** · comentarios, logs, README y docs compartidas en español · artefactos SDD en español.
+- Chat en español · **código siempre en inglés, incluidos comentarios, logs, mensajes de excepción y textos de error de la API** · **mensajes de commit en inglés** · README, docs compartidas y artefactos SDD en español.
 
 ## Qué es este servicio
 API REST (.NET 9) para gestionar turnos de trabajo de colaboradores de distintos países. Regla central: no se solapan turnos del mismo colaborador. Importa/exporta Excel y marca festivos por país vía Nager.Date. Lo consume el front Angular (`../FrontEnd`). Es una prueba técnica que se defiende en una revisión de código en vivo.

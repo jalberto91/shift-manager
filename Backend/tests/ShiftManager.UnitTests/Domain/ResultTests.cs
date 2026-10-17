@@ -17,7 +17,7 @@ public class ResultTests
     [Fact]
     public void Failure_exposes_the_error_and_has_no_value()
     {
-        var error = Error.Validation("collaborator.email", "Email inválido");
+        var error = Error.Validation("collaborator.email", "Invalid email");
 
         Result<int> result = error;
 
@@ -29,8 +29,8 @@ public class ResultTests
     [Fact]
     public void Failure_can_carry_several_errors()
     {
-        var name = Error.Validation("collaborator.name", "Nombre requerido");
-        var email = Error.Validation("collaborator.email", "Email inválido");
+        var name = Error.Validation("collaborator.name", "Name is required");
+        var email = Error.Validation("collaborator.email", "Invalid email");
 
         var result = Result.Failure([name, email]);
 

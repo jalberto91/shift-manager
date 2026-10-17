@@ -2,4 +2,8 @@
   <ItemGroup>
     <ProjectReference Include="..\ShiftManager.Application\ShiftManager.Application.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="9.0.21" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+  </ItemGroup>
 </Project>

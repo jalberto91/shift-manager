@@ -20,7 +20,7 @@ public sealed record Error(
     public static Error Conflict(string code, string message, IReadOnlyDictionary<string, object?>? extensions = null) =>
         new(code, message, ErrorType.Conflict, extensions);
 
-    // Extensions queda fuera de la igualdad: un diccionario se compara por referencia.
+    // Extensions is left out of equality: a dictionary is compared by reference.
     public bool Equals(Error? other) =>
         other is not null && Code == other.Code && Message == other.Message && Type == other.Type;
 

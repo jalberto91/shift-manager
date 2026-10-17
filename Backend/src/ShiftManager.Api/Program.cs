@@ -2,6 +2,8 @@ using System.Diagnostics;
 using System.Text.Json.Serialization;
 using Scalar.AspNetCore;
 using Serilog;
+using ShiftManager.Infrastructure;
+using ShiftManager.Infrastructure.Persistence;
 
 const string corsPolicy = "Frontend";
 
@@ -28,7 +30,9 @@ try
     builder.Services.AddOpenApi();
 
     builder.Services.AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped);
-    builder.Services.AddHealthChecks();
+    builder.Services.AddInfrastructure(
+        builder.Configuration.GetConnectionString("Default")
+        ?? throw new InvalidOperationException("Missing connection string 'ConnectionStrings:Default'."));
 
     var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
     builder.Services.AddCors(options =>
@@ -38,6 +42,8 @@ try
             .AllowAnyMethod()));
 
     var app = builder.Build();
+
+    await app.Services.ApplyMigrationsAsync();
 
     app.UseExceptionHandler();
     app.UseStatusCodePages();
@@ -54,7 +60,7 @@ try
 }
 catch (Exception ex)
 {
-    Log.Fatal(ex, "La API terminó de forma inesperada");
+    Log.Fatal(ex, "The API terminated unexpectedly");
     throw;
 }
 finally

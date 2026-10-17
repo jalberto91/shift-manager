@@ -15,7 +15,7 @@ public abstract class ApiControllerBase : ControllerBase
             throw new InvalidOperationException("A successful result has no problem to report.");
         }
 
-        // El primer error decide el status; todos aparecen en `errors`.
+        // The first error sets the status; all of them appear in `errors`.
         var first = result.Errors[0];
         var status = StatusFor(first.Type);
 

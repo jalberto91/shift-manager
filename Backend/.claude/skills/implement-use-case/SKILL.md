@@ -21,7 +21,7 @@ No hay legado. Entonces:
 - **Api**: controller **fino** (valida, despacha con `ISender`, devuelve DTO); errores según ADR-04 / ADR-10.
 
 ## Paso 2 · Reglas transversales
-`license-check` antes de cualquier NuGet · idioma (código en inglés, comentarios/logs en español) · logs estructurados · `CancellationToken` · sin código muerto.
+`license-check` antes de cualquier NuGet · idioma (código, comentarios, logs y mensajes de error en inglés) · logs estructurados · `CancellationToken` · sin código muerto.
 
 ## Paso 3 · Tests
 Unit tests = el grueso (dominio, invariantes, `Result<T>`, handlers con fakes). E2E real con el skill `verify`. Calidad sobre cantidad; los obligatorios están en `CLAUDE.md`/requisitos (solape y bordes, import fila a fila, degradación de Nager.Date).
