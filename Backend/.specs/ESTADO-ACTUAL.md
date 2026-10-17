@@ -7,9 +7,10 @@ Iteraciones chicas. Al terminar cada una: **parar**, mostrar archivos tocados, s
 **UC-02 (b2)**: tres acciones en `CollaboratorsController` (`POST` 201 + `Location` armado con la ruta, `PUT` 200, `DELETE` 204) usando `ToProblem`; sin `GET /{id}`. Luego (c): `docs/api/ENDPOINTS.md`, `.http` y E2E. Los reintentos de ADR-09 (resilience) quedan para el cliente de festivos.
 
 ## Dónde estamos
-- Fases 1 y 2, **UC-01 completo** y **UC-02 (a)** commiteados (último: `9fd35c4`). Árbol limpio.
-- Build sin warnings, 31 tests verdes. `docker compose up` verificado antes de UC-02 (API en `localhost:5080`, BD en `127.0.0.1:5433`); la migración `AddCollaboratorIsActive` aún no se ejercitó con Docker.
-- Existen las migraciones `InitialCreate` (tabla `collaborators`) y `AddCollaboratorIsActive`, y la semilla de 5 colaboradores. `dotnet-ef` 9.0.21 es herramienta local (`.config/dotnet-tools.json`): `dotnet dotnet-ef`.
+- Fases 1 y 2, **UC-01 completo** y **UC-02 (a) y (b1)** commiteados (último código: `e9c5cff`). Árbol limpio hasta este handoff.
+- Build sin warnings, 52 tests verdes. `docker compose up` verificado con las 3 migraciones sobre la semilla (API en `localhost:5080`, BD en `127.0.0.1:5433`); los endpoints de escritura aún no existen, así que no se ejercitó crear/editar/baja.
+- Existen las migraciones `InitialCreate`, `AddCollaboratorIsActive` y `AddCollaboratorEmailUniqueIndex`, y la semilla de 5 colaboradores.
+- `ICountryCatalog` ya tiene implementación (`NagerDateCountryCatalog`, config `NagerDate:BaseUrl`); los handlers de escritura existen pero no hay acciones de controller que los llamen. `dotnet-ef` 9.0.21 es herramienta local (`.config/dotnet-tools.json`): `dotnet dotnet-ef`.
 - Migrar con `dotnet dotnet-ef migrations add <Name> --project src/ShiftManager.Infrastructure --startup-project src/ShiftManager.Api --output-dir Persistence/Migrations`. El `HostAbortedException` que imprime es ruido normal de las herramientas.
 
 ## Decisiones vigentes (las que no son obvias leyendo el código)
@@ -23,11 +24,13 @@ Iteraciones chicas. Al terminar cada una: **parar**, mostrar archivos tocados, s
 - pgAdmin de escritorio en Windows: host `127.0.0.1` y `GSS encryption mode = disable` (ver skill `verify`).
 
 ## Bloque en curso
-UC-02 en curso: (a) cerrada y archivada; (b) y (c) pendientes. Ninguna iteración abierta.
+UC-02 en curso: (a) y (b1) cerradas y archivadas; (b2) y (c) pendientes. Ninguna iteración abierta.
 
 ## Abierto / pendientes con terceros
 - ADR-08 (Excel: ClosedXML vs MiniExcel) pendiente de `license-check`.
-- P5: email normalizado a minúsculas + índice único; el índice incluye inactivos (ADR-11), se crea en UC-02 (b).
+- P5: email normalizado a minúsculas + índice único incluyendo inactivos (ADR-11); el índice ya existe (b1).
+- Carrera en el índice único de email: hoy da `DbUpdateException` y `500`; mapearla a `409` queda como TBD de UC-02.
+- `Location` del `POST` sin `GET /{id}`: se arma con la ruta del recurso; anotarlo en TBDs al cerrar UC-02.
 - Cuando el front entre al compose, ajustar `Cors__AllowedOrigins__0` al puerto que publique.
 
 ## Checklist de cierre de UC-02 (Paso 4 de `implement-use-case`)
@@ -47,6 +50,7 @@ UC-02 en curso: (a) cerrada y archivada; (b) y (c) pendientes. Ninguna iteració
 - [ ] Revisión contra "qué valoran" (`00-requisitos.md` §2)
 
 ## Cerrado recientemente
+- 2026-10-17 · UC-02 (b1): casos de uso de escritura, índice único de email y catálogo de países Nager.Date → [historial](historial/2026-10-17-uc02-b1-casos-de-uso.md)
 - 2026-10-17 · UC-02 (a): spec, ADR-11, dominio de edición y baja lógica, migración `IsActive` → [historial](historial/2026-10-17-uc02-a-dominio.md)
 - 2026-10-17 · UC-01 (b): query, repositorio, migración inicial, semilla y endpoint → [historial](historial/2026-10-17-uc01-listar-colaboradores.md)
 - 2026-10-17 · Andamiaje SDD, esqueleto técnico y UC-01 (a) → [historial](historial/2026-10-17-andamiaje-y-esqueleto.md)
