@@ -10,3 +10,57 @@
 #   { "id": "<guid>", "name": "Elena Rossi", "email": "elena.rossi@example.com", "countryCode": "IT" }
 # ]
 GET {{baseUrl}}/api/collaborators
+
+### UC-02 · Create collaborator
+# Name is trimmed, email is lowercased, country code is uppercased.
+# Response 201, Location: /api/collaborators/<id>
+# { "id": "<guid>", "name": "Test User", "email": "test.user@example.com", "countryCode": "ES" }
+POST {{baseUrl}}/api/collaborators
+Content-Type: application/json
+
+{ "name": "Test User", "email": "Test.User@Example.com", "countryCode": "es" }
+
+### UC-02 · Create collaborator, several validation errors
+# Response 400 (the first error sets detail):
+# {
+#   "title": "Bad Request", "status": 400,
+#   "detail": "Name is required and must be at most 200 characters.",
+#   "errors": {
+#     "collaborator.name": ["Name is required and must be at most 200 characters."],
+#     "collaborator.email": ["Email is not a valid address."]
+#   },
+#   "traceId": "<id>"
+# }
+POST {{baseUrl}}/api/collaborators
+Content-Type: application/json
+
+{ "name": "", "email": "bad", "countryCode": "ES" }
+
+### UC-02 · Create collaborator, country not supported by Nager.Date
+# Response 400, errors: { "collaborator.country-unknown": ["Country is not supported."] }
+POST {{baseUrl}}/api/collaborators
+Content-Type: application/json
+
+{ "name": "Zed", "email": "zed@example.com", "countryCode": "ZZ" }
+
+### UC-02 · Create collaborator, email already used
+# Response 409, errors: { "collaborator.email-taken": ["Another collaborator already uses this email."] }
+POST {{baseUrl}}/api/collaborators
+Content-Type: application/json
+
+{ "name": "Dup", "email": "ana.perez@example.com", "countryCode": "ES" }
+
+### UC-02 · Update collaborator
+# Replace <id> with an id from the list. Response 200:
+# { "id": "<guid>", "name": "Test User Edited", "email": "test.user@example.com", "countryCode": "AR" }
+# Unknown id: 404 with errors { "collaborator.not-found": [...] }.
+# Email used by another collaborator: 409 with errors { "collaborator.email-taken": [...] }.
+PUT {{baseUrl}}/api/collaborators/<id>
+Content-Type: application/json
+
+{ "name": "Test User Edited", "email": "test.user@example.com", "countryCode": "AR" }
+
+### UC-02 · Deactivate collaborator
+# Response 204. Repeating the call also returns 204. Unknown id: 404 with errors { "collaborator.not-found": [...] }.
+# The collaborator disappears from the list, but its email stays taken (POST with it returns 409).
+DELETE {{baseUrl}}/api/collaborators/<id>

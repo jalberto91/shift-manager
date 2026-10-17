@@ -63,14 +63,20 @@ Casos límite:
 - [x] Api: acciones de `CollaboratorsController` (iteración b2; sin `GET /{id}`, el `Location` se arma con la ruta del recurso)
 - [x] Tests: `Update`, `Deactivate`, `IsActive` inicial (dominio, iteración a)
 - [x] Tests: handlers y catálogo de países con degradación de Nager.Date (iteración b1)
-- [ ] Docs: `docs/api/ENDPOINTS.md` y `.http` con respuestas reales (iteración c)
+- [x] Docs: `docs/api/ENDPOINTS.md` y `.http` con respuestas reales (iteración c)
 
 ## Verificación
-Pendiente.
+2026-10-17, `docker compose down -v` + `up --build` sobre BD nueva, ejercitado con curl:
+- `POST`: `201` con `Location` (email en minúsculas y país en mayúsculas); `400` con varios errores; `400` `collaborator.country-unknown`; `409` `collaborator.email-taken`.
+- `PUT`: `200`; `404` `collaborator.not-found`; `409` `collaborator.email-taken`.
+- `DELETE`: `204` (repetido también `204`); `404` con id inexistente. El dado de baja sale del listado (quedan 5) y su email sigue ocupado (`POST` con él da `409`).
+- Build sin warnings y tests verdes.
 
 ## TBDs
 1. Reactivar un colaborador dado de baja o reutilizar su email: fuera de v1. UC-06 (import por email) debe decidir qué hace si el email pertenece a un inactivo.
 2. UC-03 debe rechazar turnos nuevos para colaboradores inactivos.
+3. Carrera en el índice único de email: dos altas simultáneas con el mismo email pasan la consulta del handler y la segunda falla en el índice con `DbUpdateException` y `500`. Mapearla a `409` queda para una iteración propia, opcional.
+4. `Location` del `POST` sin `GET /{id}`: se arma con la ruta del recurso.
 
 ## Para la revisión
 - La baja es lógica para no perder turnos históricos ni bloquear la baja; está registrada como ADR-11.
