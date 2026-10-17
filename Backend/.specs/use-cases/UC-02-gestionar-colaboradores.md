@@ -15,11 +15,11 @@ Criterios de aceptación:
 - [ ] Nombre, email o país mal formados → `400` con todos los errores a la vez.
 - [ ] País con formato válido pero que Nager.Date no lista → `400` `collaborator.country-unknown`.
 - [ ] Nager.Date caído → el alta/edición se acepta si el formato es alfa-2 y se loguea un warning.
-- [ ] Id inexistente o dado de baja en `PUT`/`DELETE` → `404` `collaborator.not-found`.
+- [ ] Id inexistente en `PUT`/`DELETE`, o dado de baja en `PUT` → `404` `collaborator.not-found`.
 
 Casos límite:
 - `PUT` conservando el propio email → `200` (no choca consigo mismo).
-- `DELETE` repetido sobre un colaborador ya dado de baja → `404` (para la API ya no existe).
+- `DELETE` repetido sobre un colaborador ya dado de baja → `204` (idempotente).
 - Carrera entre dos altas con el mismo email → gana una; la otra recibe `409` por el índice único.
 
 ## Design
@@ -60,7 +60,7 @@ Casos límite:
 - [x] Application: casos de uso y puertos (iteración b1)
 - [x] Infrastructure: columna `IsActive` con `HasDefaultValue(true)` y migración `AddCollaboratorIsActive` (iteración a: sin ella EF 9 aborta el arranque por cambios de modelo pendientes, y el valor por defecto evita que los colaboradores existentes queden inactivos)
 - [x] Infrastructure: índice único de email, repositorio y `NagerDateCountryCatalog` (iteración b1: el contenedor de DI valida los handlers y exige la implementación de `ICountryCatalog` para arrancar)
-- [ ] Api: acciones de `CollaboratorsController` (iteración b2; sin `GET /{id}`, el `Location` se arma con la ruta del recurso)
+- [x] Api: acciones de `CollaboratorsController` (iteración b2; sin `GET /{id}`, el `Location` se arma con la ruta del recurso)
 - [x] Tests: `Update`, `Deactivate`, `IsActive` inicial (dominio, iteración a)
 - [x] Tests: handlers y catálogo de países con degradación de Nager.Date (iteración b1)
 - [ ] Docs: `docs/api/ENDPOINTS.md` y `.http` con respuestas reales (iteración c)
