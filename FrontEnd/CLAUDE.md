@@ -22,11 +22,11 @@ Front Angular de la gestión de turnos de trabajo: listado de turnos con marca d
 - Numeración: FE-01 Colaboradores · FE-02 Listado de turnos · FE-03 Formulario de turno · FE-04 Importar · FE-05 Exportar. Cada FE arranca cuando su UC está cerrado en el backend.
 
 ## Stack obligatorio
-- **Angular última estable**, **standalone components** (sin NgModules), **signals** para estado local y de feature, `inject()` en vez de constructor, **control flow nativo** (`@if`, `@for`, `@switch`), `ChangeDetectionStrategy.OnPush` en todo componente, TypeScript `strict`.
+- **Angular 21** (fijado por la licencia de PrimeNG, ADR-03), **standalone components** (sin NgModules), **signals** para estado local y de feature, `inject()` en vez de constructor, **control flow nativo** (`@if`, `@for`, `@switch`), `ChangeDetectionStrategy.OnPush` en todo componente, TypeScript `strict`.
 - HTTP con `HttpClient` + **interceptores funcionales** (errores; sin auth).
 - Formularios: **Reactive Forms tipados**.
 - Rutas con **lazy loading** por feature (`loadComponent` / `loadChildren`) + guards funcionales cuando hagan falta.
-- UI: **PrimeNG** (P15), tema por defecto. Estilos: SCSS mínimo, sin Tailwind.
+- UI: **PrimeNG 21.1.x (MIT)** (P15), tema por defecto. No subir a PrimeNG 22 (licencia PrimeUI). Estilos: SCSS mínimo, sin Tailwind.
 - Tests: el runner por defecto del CLI. Node ≥ 22 (`nvm use 22.17.1`).
 - Nada de NgRx salvo ADR que lo justifique (signals + servicios de estado).
 

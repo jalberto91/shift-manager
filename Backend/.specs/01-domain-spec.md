@@ -5,6 +5,6 @@ Las entidades **emergen de los casos de uso**; aquí solo se indica qué spec de
 | Entidad / VO | Definida en | Estado |
 |---|---|---|
 | Collaborator (`Domain/Collaborators/`) | UC-01 (creación e invariantes); UC-02 (unicidad, edición, baja) | creación, edición y baja lógica en el dominio (ADR-11); unicidad en Application |
-| Turno (`Shift`) | UC-03 | por definir |
+| Turno (`Shift`, `Domain/Shifts/`) | UC-03 (alta y regla de solape); UC-04 (edición) | creación y regla de solape en el dominio; la comprobación contra los turnos existentes va en Application |
 | Festivo (modelo de lectura, no persistido) | UC-05 | por definir |
 | Informe de importación (modelo de aplicación) | UC-06 | por definir |

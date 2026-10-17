@@ -38,7 +38,7 @@ En desarrollo `ng serve` usa `proxy.conf.json` hacia `http://localhost:5080`; en
 ### ADR-01 · Angular standalone + signals
 - **Contexto**: front pequeño, se defiende en vivo; el CLI moderno genera standalone por defecto.
 - **Alternativas**: NgModules; estado con RxJS puro.
-- **Decisión**: Angular última estable, standalone, signals, `inject()`, control flow nativo, OnPush, `strict`.
+- **Decisión**: Angular 21 (la última estable es la 22; se fija la 21 por la licencia de PrimeNG, ver ADR-03), standalone, signals, `inject()`, control flow nativo, OnPush, `strict`.
 - **Consecuencias**: (+) menos boilerplate, detección de cambios predecible. (−) APIs de signals/formularios aún evolucionan entre versiones.
 - **Estado**: Aceptado
 
@@ -52,8 +52,8 @@ En desarrollo `ng serve` usa `proxy.conf.json` hacia `http://localhost:5080`; en
 ### ADR-03 · Librería de UI y estilos
 - **Contexto**: se pide front funcional y limpio, sin diseño propio (P15).
 - **Alternativas**: Angular Material; UI a mano.
-- **Decisión**: PrimeNG con el tema por defecto (tabla, diálogo, formularios, `FileUpload`, toasts). SCSS mínimo, sin Tailwind. Cada paquete pasa por `license-check`.
-- **Consecuencias**: (+) casi cero CSS propio. (−) dependencia pesada; su versión debe soportar la de Angular.
+- **Decisión**: PrimeNG **21.1.x** (MIT) con el tema por defecto (tabla, diálogo, formularios, `FileUpload`, toasts) y **Angular 21**, no 22. PrimeNG 22 pasó a la licencia PrimeUI (license key y renovación anual), que no es libre del todo (E2); PrimeNG 21 es MIT y exige Angular 21. SCSS mínimo, sin Tailwind. Cada paquete pasa por `license-check`.
+- **Consecuencias**: (+) casi cero CSS propio y sin license key. (−) Angular 21 queda una mayor por detrás de la última estable; dependencia pesada; fijar versiones para que `npm` no suba `@primeuix/*` a ramas con otra licencia.
 - **Estado**: Aceptado
 
 ### ADR-04 · Contrato de errores consumido desde el backend

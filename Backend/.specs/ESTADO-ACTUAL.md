@@ -4,7 +4,7 @@
 Iteraciones chicas. Al terminar cada una: **parar**, mostrar archivos tocados, sugerir mensaje de commit (Conventional Commits, **en inglés**, con scope) y **esperar "seguí"**. El usuario commitea a mano. Nunca encadenar dos iteraciones sin "seguí". Si una crece más de lo previsto, cortarla en dos antes de seguir.
 
 ## ⏭️ Próximo paso
-**UC-03 (a)**, alta de turno con regla de no solape (R2, R3: el corazón del proyecto). Aún no hay spec: crear `.specs/use-cases/UC-03-alta-de-turno.md` desde `_TEMPLATE-UC.md`, leyendo antes `00-requisitos.md` (fila UC-03), `01-domain-spec.md` (`Shift` figura "por definir") y ADR-10 en `architecture.md`. El spec debe cubrir el TBD 2 de UC-02 (rechazar colaboradores inactivos) y los bordes del solape. Alternativa opcional antes de UC-03: mapear la carrera del email único a `409` (TBD 3 de UC-02). Los reintentos de ADR-09 (resilience) quedan para el cliente de festivos.
+**UC-03 (b)**: según `.specs/use-cases/UC-03-alta-de-turno.md` (Design, "Regla fuera del dominio"): `CreateShift` (Command + Handler), `ShiftDto`, puerto `IShiftRepository`, error `shift.collaborator-unavailable` y tests del handler con fakes (ver `Application/Fakes.cs`). Después, (c) persistencia, endpoint, docs y E2E. Alternativa opcional antes de UC-03: mapear la carrera del email único a `409` (TBD 3 de UC-02). Los reintentos de ADR-09 (resilience) quedan para el cliente de festivos.
 
 ## Dónde estamos
 - Fases 1 y 2, **UC-01 y UC-02 completos** y commiteados (último código: `e75456c`; docs de cierre: `b7a03c5`). Árbol limpio hasta este handoff.
@@ -24,7 +24,7 @@ Iteraciones chicas. Al terminar cada una: **parar**, mostrar archivos tocados, s
 - pgAdmin de escritorio en Windows: host `127.0.0.1` y `GSS encryption mode = disable` (ver skill `verify`).
 
 ## Bloque en curso
-UC-02 cerrado y archivado. UC-03 sin empezar. Ninguna iteración abierta.
+UC-02 cerrado y archivado. UC-03: spec aprobado y (a) hecha (`Shift`, `ShiftErrors`, `OverlapsWith` y sus tests, sin commitear); (b) y (c) pendientes. Ninguna iteración abierta.
 
 ## Abierto / pendientes con terceros
 - ADR-08 (Excel: ClosedXML vs MiniExcel) pendiente de `license-check`.
