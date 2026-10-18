@@ -14,6 +14,13 @@ internal sealed class FakeShiftRepository : IShiftRepository
         Task.FromResult<IReadOnlyList<Shift>>(
             Stored.Where(s => s.CollaboratorId == collaboratorId && s.Date == date).ToList());
 
+    public Task<IReadOnlyList<Shift>> ListAsync(DateOnly? from, DateOnly? to, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyList<Shift>>(
+            Stored.Where(s => (from is null || s.Date >= from) && (to is null || s.Date <= to)).ToList());
+
+    public Task<Shift?> GetByIdAsync(Guid id, CancellationToken cancellationToken) =>
+        Task.FromResult(Stored.FirstOrDefault(s => s.Id == id));
+
     public void Add(Shift shift) => Stored.Add(shift);
 
     public Task SaveChangesAsync(CancellationToken cancellationToken)

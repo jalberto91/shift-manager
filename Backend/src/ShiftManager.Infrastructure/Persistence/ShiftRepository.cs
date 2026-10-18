@@ -13,6 +13,18 @@ public sealed class ShiftRepository(AppDbContext db) : IShiftRepository
             .Where(s => s.CollaboratorId == collaboratorId && s.Date == date)
             .ToListAsync(cancellationToken);
 
+    public async Task<IReadOnlyList<Shift>> ListAsync(
+        DateOnly? from, DateOnly? to, CancellationToken cancellationToken) =>
+        await db.Shifts
+            .AsNoTracking()
+            .Where(s => (from == null || s.Date >= from) && (to == null || s.Date <= to))
+            .OrderBy(s => s.Date)
+            .ThenBy(s => s.StartTime)
+            .ToListAsync(cancellationToken);
+
+    public Task<Shift?> GetByIdAsync(Guid id, CancellationToken cancellationToken) =>
+        db.Shifts.FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
+
     public void Add(Shift shift) => db.Shifts.Add(shift);
 
     public Task SaveChangesAsync(CancellationToken cancellationToken) => db.SaveChangesAsync(cancellationToken);
