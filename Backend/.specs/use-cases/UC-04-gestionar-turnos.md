@@ -67,8 +67,8 @@ Casos límite:
 - [x] Tests: `Update` en el dominio (iteración a)
 - [x] Application + Infrastructure: `ListShifts` y `GetShift` con `ListAsync` y `GetByIdAsync` en el puerto y el repositorio, más `shift.not-found` y `shift.date-range` (iteración b1)
 - [x] Tests: handlers de consulta con fakes (iteración b1)
-- [ ] Application + Infrastructure: `UpdateShift` y `DeleteShift`, `excludingId` y `Remove` (iteración b2)
-- [ ] Tests: handlers de edición y borrado con fakes (iteración b2)
+- [x] Application + Infrastructure: `UpdateShift` y `DeleteShift`, `excludingId` y `Remove` (iteración b2)
+- [x] Tests: handlers de edición y borrado con fakes (iteración b2)
 - [ ] Api: acciones de `ShiftsController` y `ShiftRequest` (iteración c)
 - [ ] Docs: `docs/api/ENDPOINTS.md` y `shifts.http` con respuestas reales (iteración c)
 

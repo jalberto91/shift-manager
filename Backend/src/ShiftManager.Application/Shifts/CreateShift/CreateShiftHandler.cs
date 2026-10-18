@@ -24,7 +24,8 @@ public sealed class CreateShiftHandler(ICollaboratorRepository collaborators, IS
             return ShiftErrors.CollaboratorUnavailable;
         }
 
-        var sameDay = await shifts.ListByCollaboratorAndDateAsync(shift.CollaboratorId, shift.Date, cancellationToken);
+        var sameDay = await shifts.ListByCollaboratorAndDateAsync(
+            shift.CollaboratorId, shift.Date, excludingId: null, cancellationToken);
         var conflicting = sameDay.FirstOrDefault(existing => shift.OverlapsWith(existing));
         if (conflicting is not null)
         {

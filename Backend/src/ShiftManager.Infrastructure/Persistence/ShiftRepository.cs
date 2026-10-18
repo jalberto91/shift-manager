@@ -7,10 +7,10 @@ namespace ShiftManager.Infrastructure.Persistence;
 public sealed class ShiftRepository(AppDbContext db) : IShiftRepository
 {
     public async Task<IReadOnlyList<Shift>> ListByCollaboratorAndDateAsync(
-        Guid collaboratorId, DateOnly date, CancellationToken cancellationToken) =>
+        Guid collaboratorId, DateOnly date, Guid? excludingId, CancellationToken cancellationToken) =>
         await db.Shifts
             .AsNoTracking()
-            .Where(s => s.CollaboratorId == collaboratorId && s.Date == date)
+            .Where(s => s.CollaboratorId == collaboratorId && s.Date == date && s.Id != excludingId)
             .ToListAsync(cancellationToken);
 
     public async Task<IReadOnlyList<Shift>> ListAsync(
@@ -26,6 +26,8 @@ public sealed class ShiftRepository(AppDbContext db) : IShiftRepository
         db.Shifts.FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
 
     public void Add(Shift shift) => db.Shifts.Add(shift);
+
+    public void Remove(Shift shift) => db.Shifts.Remove(shift);
 
     public Task SaveChangesAsync(CancellationToken cancellationToken) => db.SaveChangesAsync(cancellationToken);
 }

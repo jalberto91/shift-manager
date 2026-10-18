@@ -10,9 +10,9 @@ internal sealed class FakeShiftRepository : IShiftRepository
     public int SaveCount { get; private set; }
 
     public Task<IReadOnlyList<Shift>> ListByCollaboratorAndDateAsync(
-        Guid collaboratorId, DateOnly date, CancellationToken cancellationToken) =>
+        Guid collaboratorId, DateOnly date, Guid? excludingId, CancellationToken cancellationToken) =>
         Task.FromResult<IReadOnlyList<Shift>>(
-            Stored.Where(s => s.CollaboratorId == collaboratorId && s.Date == date).ToList());
+            Stored.Where(s => s.CollaboratorId == collaboratorId && s.Date == date && s.Id != excludingId).ToList());
 
     public Task<IReadOnlyList<Shift>> ListAsync(DateOnly? from, DateOnly? to, CancellationToken cancellationToken) =>
         Task.FromResult<IReadOnlyList<Shift>>(
@@ -22,6 +22,8 @@ internal sealed class FakeShiftRepository : IShiftRepository
         Task.FromResult(Stored.FirstOrDefault(s => s.Id == id));
 
     public void Add(Shift shift) => Stored.Add(shift);
+
+    public void Remove(Shift shift) => Stored.Remove(shift);
 
     public Task SaveChangesAsync(CancellationToken cancellationToken)
     {
