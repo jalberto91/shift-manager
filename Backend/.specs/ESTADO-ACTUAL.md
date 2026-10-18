@@ -4,7 +4,7 @@
 Iteraciones chicas. Al terminar cada una: **parar**, mostrar archivos tocados, sugerir mensaje de commit (Conventional Commits, **en inglés**, con scope) y **esperar "seguí"**. El usuario commitea a mano. Nunca encadenar dos iteraciones sin "seguí". Si una crece más de lo previsto, cortarla en dos antes de seguir.
 
 ## ⏭️ Próximo paso
-**UC-04** (listar, leer, editar y borrar turnos con filtro por rango de fechas; R2, R3; P13 sin paginación). Aún no hay spec: crear `.specs/use-cases/UC-04-gestionar-turnos.md` desde `_TEMPLATE-UC.md`, leyendo antes `00-requisitos.md` (fila UC-04, P13) y `UC-03-alta-de-turno.md` (Design). Puntos a resolver en el spec: `excludingId` en `IShiftRepository` para que editar no choque consigo mismo, `Shift.Update` reutilizando la validación de `Create`, el `GET /{id}` que el `Location` de UC-03 ya apunta, y qué hace editar con un colaborador dado de baja. Los reintentos de ADR-09 (resilience) quedan para el cliente de festivos.
+**UC-04 (a)**: implementar según `.specs/use-cases/UC-04-gestionar-turnos.md` (ya redactado, pendiente de tu visto bueno): `Shift.Update`, `ShiftErrors.NotFound` y `DateRange`, y sus tests en el dominio. Después, (b1) consultas, (b2) edición y borrado, (c) endpoints, docs y E2E. Los reintentos de ADR-09 (resilience) quedan para el cliente de festivos.
 
 ## Dónde estamos
 - Fases 1 y 2, **UC-01, UC-02 y UC-03 completos** y commiteados (último código: `10471c9`). Árbol limpio hasta este handoff.
@@ -24,7 +24,7 @@ Iteraciones chicas. Al terminar cada una: **parar**, mostrar archivos tocados, s
 - pgAdmin de escritorio en Windows: host `127.0.0.1` y `GSS encryption mode = disable` (ver skill `verify`).
 
 ## Bloque en curso
-UC-03 cerrado y archivado. UC-04 sin empezar. Ninguna iteración abierta.
+UC-03 cerrado y archivado. UC-04: spec redactado (sin código); (a), (b1), (b2) y (c) pendientes. Ninguna iteración abierta.
 
 ## Abierto / pendientes con terceros
 - ADR-08 (Excel: ClosedXML vs MiniExcel) pendiente de `license-check`.
