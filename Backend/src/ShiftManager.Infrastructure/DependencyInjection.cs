@@ -16,6 +16,7 @@ public static class DependencyInjection
         services.AddScoped<ICollaboratorRepository, CollaboratorRepository>();
         services.AddScoped<IShiftRepository, ShiftRepository>();
         services.AddScoped<IShiftSheetReader, ClosedXmlShiftSheetReader>();
+        services.AddScoped<IShiftSheetWriter, ClosedXmlShiftSheetWriter>();
         services.AddHealthChecks().AddDbContextCheck<AppDbContext>("database");
 
         services.AddMemoryCache();
