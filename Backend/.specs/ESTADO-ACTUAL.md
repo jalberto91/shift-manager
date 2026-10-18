@@ -4,11 +4,11 @@
 Iteraciones chicas. Al terminar cada una: **parar**, mostrar archivos tocados, sugerir mensaje de commit (Conventional Commits, **en inglés**, con scope) y **esperar "seguí"**. El usuario commitea a mano. Nunca encadenar dos iteraciones sin "seguí". Si una crece más de lo previsto, cortarla en dos antes de seguir.
 
 ## ⏭️ Próximo paso
-**UC-04 (b2)**: según `.specs/use-cases/UC-04-gestionar-turnos.md` (Design, "Capas previstas" y "Reglas fuera del dominio"): `UpdateShift` y `DeleteShift`; `excludingId` en `ListByCollaboratorAndDateAsync` y `Remove` en `IShiftRepository`, `ShiftRepository` y `FakeShiftRepository`; `GetByIdAsync` ya existe (con tracking). Tests con fakes (casos límite del spec: mismos valores, ampliar dentro del hueco, mover a día ocupado, cambiar de colaborador). Después (c): endpoints, `ShiftRequest`, docs, `.http` y E2E. Los reintentos de ADR-09 (resilience) quedan para el cliente de festivos.
+**UC-04 (c)**: según `.specs/use-cases/UC-04-gestionar-turnos.md` (Requirements: criterios de aceptación; Design: tabla de endpoints y "Capas previstas", Api): cuatro acciones en `ShiftsController` (`GET` lista con `from`/`to`, `GET {id}`, `PUT {id}`, `DELETE {id}`); `CreateShiftRequest` pasa a `ShiftRequest` (sirve a `POST` y `PUT`, como `CollaboratorRequest`). Luego `docs/api/ENDPOINTS.md`, `shifts.http` con respuestas reales, E2E con la skill `verify` (confirma además el filtro con parámetros nulos, el orden y `excludingId`/`Remove` contra PostgreSQL), sección "Para la revisión" y cierre del UC. Los reintentos de ADR-09 (resilience) quedan para el cliente de festivos.
 
 ## Dónde estamos
-- Fases 1 y 2, **UC-01, UC-02 y UC-03 completos** y UC-04 (a) y (b1) commiteadas (último código: `2d5206a`). Árbol limpio hasta este handoff.
-- Build sin warnings, 86 tests verdes. Las consultas de turnos (b1) aún no se ejercitaron contra PostgreSQL: el E2E es de (c). `docker compose up` verificado con las 4 migraciones sobre la semilla (API en `localhost:5080`, BD en `127.0.0.1:5433`), con los endpoints de colaboradores y `POST /api/shifts` ejercitados. Quedan en la BD de pruebas turnos del 2026-03-10 de Ana y Bruno, y colaboradores dados de baja (`test.user@…`, `temp.baja@…`); `docker compose down -v` los limpia. La API sigue levantada en el compose.
+- Fases 1 y 2, **UC-01, UC-02 y UC-03 completos** y UC-04 (a), (b1) y (b2) commiteadas (último código: `10627a0`). Árbol limpio hasta este handoff.
+- Build sin warnings, 97 tests verdes. Las consultas y la edición/borrado de turnos (b1, b2) aún no se ejercitaron contra PostgreSQL: el E2E es de (c). `docker compose up` verificado con las 4 migraciones sobre la semilla (API en `localhost:5080`, BD en `127.0.0.1:5433`), con los endpoints de colaboradores y `POST /api/shifts` ejercitados. Quedan en la BD de pruebas turnos del 2026-03-10 de Ana y Bruno, y colaboradores dados de baja (`test.user@…`, `temp.baja@…`); `docker compose down -v` los limpia. La API sigue levantada en el compose.
 - Existen las migraciones `InitialCreate`, `AddCollaboratorIsActive`, `AddCollaboratorEmailUniqueIndex` y `AddShifts`, y la semilla de 5 colaboradores.
 - `ICountryCatalog` tiene implementación (`NagerDateCountryCatalog`, config `NagerDate:BaseUrl`). `dotnet-ef` 9.0.21 es herramienta local (`.config/dotnet-tools.json`): `dotnet dotnet-ef`.
 - Migrar con `dotnet dotnet-ef migrations add <Name> --project src/ShiftManager.Infrastructure --startup-project src/ShiftManager.Api --output-dir Persistence/Migrations`. El `HostAbortedException` que imprime es ruido normal de las herramientas.
@@ -24,7 +24,7 @@ Iteraciones chicas. Al terminar cada una: **parar**, mostrar archivos tocados, s
 - pgAdmin de escritorio en Windows: host `127.0.0.1` y `GSS encryption mode = disable` (ver skill `verify`).
 
 ## Bloque en curso
-UC-03 cerrado y archivado. UC-04 en curso: (a) y (b1) cerradas y archivadas; (b2) y (c) pendientes. Ninguna iteración abierta.
+UC-03 cerrado y archivado. UC-04 en curso: (a), (b1) y (b2) cerradas y archivadas; (c) pendiente. Ninguna iteración abierta.
 
 ## Abierto / pendientes con terceros
 - ADR-08 (Excel: ClosedXML vs MiniExcel) pendiente de `license-check`.
@@ -41,6 +41,7 @@ UC-03 cerrado y archivado. UC-04 en curso: (a) y (b1) cerradas y archivadas; (b2
 - [ ] Revisión contra "qué valoran" (`00-requisitos.md` §2)
 
 ## Cerrado recientemente
+- 2026-10-17 · UC-04 (b2): `UpdateShift` y `DeleteShift` con `excludingId` y `Remove` → [historial](historial/2026-10-17-uc04-b2-edicion-y-borrado.md)
 - 2026-10-17 · UC-04 (b1): `ListShifts` y `GetShift` con `ListAsync` y `GetByIdAsync`, `shift.not-found` y `shift.date-range` → [historial](historial/2026-10-17-uc04-b1-consultas.md)
 - 2026-10-17 · UC-04 (a): spec de gestión de turnos y `Shift.Update` con validación compartida → [historial](historial/2026-10-17-uc04-a-dominio.md)
 - 2026-10-17 · UC-03: alta de turno con regla de no solape, persistencia y `POST /api/shifts` → [historial](historial/2026-10-17-uc03-alta-de-turno.md)
