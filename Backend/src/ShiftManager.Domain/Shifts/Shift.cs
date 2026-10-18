@@ -15,15 +15,47 @@ public sealed class Shift
 
     public Guid Id { get; }
 
-    public Guid CollaboratorId { get; }
+    public Guid CollaboratorId { get; private set; }
 
-    public DateOnly Date { get; }
+    public DateOnly Date { get; private set; }
 
-    public TimeOnly StartTime { get; }
+    public TimeOnly StartTime { get; private set; }
 
-    public TimeOnly EndTime { get; }
+    public TimeOnly EndTime { get; private set; }
 
     public static Result<Shift> Create(Guid collaboratorId, DateOnly date, TimeOnly startTime, TimeOnly endTime)
+    {
+        var valid = Validate(date, startTime, endTime);
+
+        return valid.IsFailure
+            ? Result<Shift>.Failure(valid.Errors)
+            : new Shift(Guid.NewGuid(), collaboratorId, date, startTime, endTime);
+    }
+
+    public Result Update(Guid collaboratorId, DateOnly date, TimeOnly startTime, TimeOnly endTime)
+    {
+        var valid = Validate(date, startTime, endTime);
+
+        if (valid.IsFailure)
+        {
+            return valid;
+        }
+
+        CollaboratorId = collaboratorId;
+        Date = date;
+        StartTime = startTime;
+        EndTime = endTime;
+        return Result.Success();
+    }
+
+    // Half-open intervals [start, end): shifts that only touch at a boundary do not overlap.
+    public bool OverlapsWith(Shift other) =>
+        CollaboratorId == other.CollaboratorId
+        && Date == other.Date
+        && StartTime < other.EndTime
+        && other.StartTime < EndTime;
+
+    private static Result Validate(DateOnly date, TimeOnly startTime, TimeOnly endTime)
     {
         var errors = new List<Error>();
 
@@ -37,15 +69,6 @@ public sealed class Shift
             errors.Add(ShiftErrors.InvalidTimeRange);
         }
 
-        return errors.Count > 0
-            ? Result<Shift>.Failure(errors)
-            : new Shift(Guid.NewGuid(), collaboratorId, date, startTime, endTime);
+        return errors.Count > 0 ? Result.Failure(errors) : Result.Success();
     }
-
-    // Half-open intervals [start, end): shifts that only touch at a boundary do not overlap.
-    public bool OverlapsWith(Shift other) =>
-        CollaboratorId == other.CollaboratorId
-        && Date == other.Date
-        && StartTime < other.EndTime
-        && other.StartTime < EndTime;
 }

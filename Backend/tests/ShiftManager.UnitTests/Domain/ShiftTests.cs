@@ -49,6 +49,50 @@ public class ShiftTests
         Assert.Equal([ShiftErrors.InvalidDate, ShiftErrors.InvalidTimeRange], result.Errors);
     }
 
+    [Fact]
+    public void Update_replaces_every_field_and_keeps_the_id()
+    {
+        var shift = ShiftAt("09:00", "13:00");
+        var id = shift.Id;
+        var otherCollaborator = Guid.NewGuid();
+
+        var result = shift.Update(otherCollaborator, Day.AddDays(1), new TimeOnly(14, 0), new TimeOnly(18, 0));
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(id, shift.Id);
+        Assert.Equal(otherCollaborator, shift.CollaboratorId);
+        Assert.Equal(Day.AddDays(1), shift.Date);
+        Assert.Equal(new TimeOnly(14, 0), shift.StartTime);
+        Assert.Equal(new TimeOnly(18, 0), shift.EndTime);
+    }
+
+    [Fact]
+    public void Update_with_invalid_data_reports_every_error_and_changes_nothing()
+    {
+        var shift = ShiftAt("09:00", "13:00");
+
+        var result = shift.Update(Guid.NewGuid(), default, new TimeOnly(13, 0), new TimeOnly(9, 0));
+
+        Assert.Equal([ShiftErrors.InvalidDate, ShiftErrors.InvalidTimeRange], result.Errors);
+        Assert.Equal(Collaborator, shift.CollaboratorId);
+        Assert.Equal(Day, shift.Date);
+        Assert.Equal(new TimeOnly(9, 0), shift.StartTime);
+        Assert.Equal(new TimeOnly(13, 0), shift.EndTime);
+    }
+
+    [Fact]
+    public void Update_moves_the_shift_in_and_out_of_overlap()
+    {
+        var shift = ShiftAt("09:00", "13:00");
+        var other = ShiftAt("13:00", "17:00");
+
+        shift.Update(Collaborator, Day, new TimeOnly(12, 0), new TimeOnly(14, 0));
+        Assert.True(shift.OverlapsWith(other));
+
+        shift.Update(Collaborator, Day, new TimeOnly(9, 0), new TimeOnly(13, 0));
+        Assert.False(shift.OverlapsWith(other));
+    }
+
     [Theory]
     [InlineData("09:00", "13:00", "13:00", "17:00")]
     [InlineData("13:00", "17:00", "09:00", "13:00")]

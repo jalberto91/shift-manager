@@ -63,9 +63,9 @@ Casos límite:
 - Un `from` o `to` con formato inválido lo rechaza el binder con `400`, igual que las horas mal formadas (TBD 2 de UC-03).
 
 ## Tasks
-- [ ] Domain: `Shift.Update`, `ShiftErrors.NotFound` y `DateRange` (iteración a)
-- [ ] Tests: `Update` en el dominio (iteración a)
-- [ ] Application + Infrastructure: `ListShifts` y `GetShift` con `ListAsync` y `GetByIdAsync` en el puerto y el repositorio (iteración b1)
+- [x] Domain: `Shift.Update` con la validación compartida con `Create` (iteración a; `ShiftErrors.NotFound` y `DateRange` se agregan en (b1), donde se usan)
+- [x] Tests: `Update` en el dominio (iteración a)
+- [ ] Application + Infrastructure: `ListShifts` y `GetShift` con `ListAsync` y `GetByIdAsync` en el puerto y el repositorio, más `shift.not-found` y `shift.date-range` (iteración b1)
 - [ ] Tests: handlers de consulta con fakes (iteración b1)
 - [ ] Application + Infrastructure: `UpdateShift` y `DeleteShift`, `excludingId` y `Remove` (iteración b2)
 - [ ] Tests: handlers de edición y borrado con fakes (iteración b2)
