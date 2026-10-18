@@ -8,7 +8,6 @@ public interface ICollaboratorRepository
 
     Task<Collaborator?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
 
-    // Includes inactive collaborators: their shifts stay listed (ADR-11).
     Task<IReadOnlyDictionary<Guid, string>> GetCountryCodesAsync(
         IReadOnlyCollection<Guid> ids, CancellationToken cancellationToken);
 

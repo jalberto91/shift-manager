@@ -56,15 +56,4 @@ public class NagerDateCountryCatalogTests
 
         Assert.Equal(2, handler.Calls);
     }
-
-    private sealed class StubHandler(Func<HttpResponseMessage> response) : HttpMessageHandler
-    {
-        public int Calls { get; private set; }
-
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-        {
-            Calls++;
-            return Task.FromResult(response());
-        }
-    }
 }

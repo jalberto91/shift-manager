@@ -22,12 +22,10 @@ public sealed class ListShiftsHandler(
         var countries = await collaborators.GetCountryCodesAsync(
             list.Select(s => s.CollaboratorId).Distinct().ToList(), cancellationToken);
 
-        var holidaysByCountryYear = new Dictionary<(string Country, int Year), IReadOnlyList<PublicHoliday>?>();
-        var keys = list.Select(s => (Country: countries[s.CollaboratorId], s.Date.Year)).Distinct();
-        foreach (var (country, year) in keys)
-        {
-            holidaysByCountryYear[(country, year)] = await holidayCatalog.GetAsync(country, year, cancellationToken);
-        }
+        var keys = list.Select(s => (Country: countries[s.CollaboratorId], s.Date.Year)).Distinct().ToList();
+        var answers = await Task.WhenAll(
+            keys.Select(k => holidayCatalog.GetAsync(k.Country, k.Year, cancellationToken)));
+        var holidaysByCountryYear = keys.Zip(answers).ToDictionary(pair => pair.First, pair => pair.Second);
 
         return list
             .Select(s => ShiftListItemDto.From(
@@ -42,7 +40,10 @@ public sealed class ListShiftsHandler(
             return HolidayInfo.Unknown;
         }
 
-        var holiday = holidays.FirstOrDefault(h => h.Date == date);
+        var holiday = holidays
+            .Where(h => h.Date == date)
+            .OrderByDescending(h => h.IsGlobal)
+            .FirstOrDefault();
 
         return holiday is null ? HolidayInfo.None : HolidayInfo.From(holiday);
     }

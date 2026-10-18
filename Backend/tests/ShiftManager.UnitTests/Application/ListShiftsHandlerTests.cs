@@ -117,6 +117,20 @@ public class ListShiftsHandlerTests
     }
 
     [Fact]
+    public async Task Prefers_the_nationwide_holiday_when_a_regional_one_falls_on_the_same_day()
+    {
+        SeedOn(Day);
+        _holidays.Answer(
+            "ES", 2026,
+            new PublicHoliday(Day, "Regional day", false),
+            new PublicHoliday(Day, "National day", true));
+
+        var result = await List();
+
+        Assert.Equal(new HolidayInfo(HolidayStatus.Holiday, "National day", true), result.Value.Single().Holiday);
+    }
+
+    [Fact]
     public async Task Marks_a_shift_on_an_ordinary_day_as_none()
     {
         SeedOn(Day);

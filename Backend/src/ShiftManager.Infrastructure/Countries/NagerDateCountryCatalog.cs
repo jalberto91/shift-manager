@@ -28,7 +28,7 @@ public sealed class NagerDateCountryCatalog(HttpClient http, IMemoryCache cache,
 
         try
         {
-            var countries = await http.GetFromJsonAsync<List<CountryResponse>>("api/v3/AvailableCountries", cancellationToken)
+            var countries = await http.GetFromJsonAsync<List<CountryResponse>>("api/v4/Countries/Available", cancellationToken)
                 ?? throw new JsonException("Nager.Date returned an empty body.");
 
             var codes = countries.Select(c => c.CountryCode.ToUpperInvariant()).ToHashSet();

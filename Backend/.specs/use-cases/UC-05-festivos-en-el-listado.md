@@ -35,30 +35,30 @@ Casos límite:
 
 **Handler** (`ListShiftsHandler`): lista los turnos, obtiene los países, pide una vez cada par país+año al puerto y arma la marca por turno. Lista `null` → `Unknown`; fecha presente → `Holiday`; si no → `None`. No hay regla de dominio nueva: es una proyección de lectura, `Domain` no cambia.
 
-**Infraestructura** (iteración b): cliente tipado de `GET api/v3/PublicHolidays/{year}/{countryCode}` (respuesta con `date`, `name`, `global`, `counties`; verificado contra la API real), caché `IMemoryCache` por país+año solo para aciertos, `LogWarning` y `null` al fallar, y resilience handler con reintentos acotados y timeout corto (ADR-09). El paquete `Microsoft.Extensions.Http.Resilience` pasa por `license-check` antes de instalarlo.
+**Infraestructura** (iteración b): cliente tipado de `GET api/v4/Holidays/{countryCode}/{year}` (respuesta con `date`, `name`, `nationalHoliday`, `subdivisionCodes`; verificado contra la API real; ver el ajuste de versión en ADR-09), caché `IMemoryCache` por país+año solo para aciertos, `LogWarning` y `null` al fallar, timeout de 3 s y sin resilience handler ni reintentos (ajuste UC-05 de ADR-09): reintentar lo hace la siguiente petición, porque el fallo no se cachea. No se agrega ningún paquete.
 
 **Decisiones y supuestos**
 - Marca como objeto `holiday` con `status` en vez de un booleano: `unknown` es un tercer estado real (P10) y un booleano lo escondería.
-- Las llamadas a Nager.Date son secuenciales: el número de pares país+año de un listado es pequeño y el resultado queda cacheado. Paralelizar sería complejidad sin dato que lo justifique.
+- Los pares país+año de un listado se consultan en paralelo (`Task.WhenAll`): con Nager.Date caído el peor caso es un solo timeout de 3 s, no uno por par. `IMemoryCache` y `HttpClient` son seguros entre hilos.
 - Un festivo regional se marca aunque la región del colaborador no se conozca: el modelo no guarda región y `isGlobal` deja que el front lo distinga.
-- Mientras no exista el cliente real (iteración b), nada registra `IHolidayCatalog` y es probable que el contenedor de DI no deje arrancar la API (sin verificar); no se levanta el compose entre (a) y (b).
-- Con Nager.Date caído, las llamadas secuenciales suman un timeout por cada par país+año y los fallos no se cachean. En (b) se decide entre paralelizar con `Task.WhenAll` o acotar con un timeout total corto en el cliente.
-- Nager.Date v3 tiene fin de soporte el 2027-01-31 (hay una v4); el cliente queda detrás de `IHolidayCatalog`, así que migrar es cambiar una sola clase.
+- Un fallo transitorio de un solo intento deja `Unknown` hasta que se vuelva a pedir el listado; se acepta a cambio de no depender de `Microsoft.Extensions.Http.Resilience`.
+- Se usa la v4 de Nager.Date porque la v3 está deprecada (fin de soporte 2027-01-31); el enunciado cita la v3, el choque queda en ADR-09. `IsGlobal` del puerto se mapea desde `nationalHoliday`.
 
 ## Tasks
 - [x] Application: `IHolidayCatalog`, `PublicHoliday`, `ShiftListItemDto`, `HolidayInfo`, `HolidayStatus` y `ListShiftsHandler` con la marca (iteración a)
 - [x] Infrastructure: `GetCountryCodesAsync` en `CollaboratorRepository` (iteración a)
 - [x] Tests: handler con festivo global, regional, día normal, `Unknown`, países distintos, una consulta por país+año, colaborador de baja y listado vacío (iteración a)
-- [ ] Infrastructure: cliente de festivos con caché y resilience handler, y registro en `AddInfrastructure` (iteración b)
-- [ ] Tests: cliente con `HttpMessageHandler` falso (acierto, caché, fallo sin cachear) (iteración b)
+- [x] Infrastructure: `NagerDatePublicHolidayCatalog` con caché y timeout de 3 s, registro en `AddInfrastructure` y consulta en paralelo en el handler (iteración b1)
+- [x] Tests: cliente con `HttpMessageHandler` falso (mapeo global y regional, ruta, caché, fallo y JSON inválido sin cachear) (iteración b1)
 - [ ] Api: sin cambios de código más allá del tipo documentado en `ProducesResponseType` (ya hecho en a)
-- [ ] Docs: `docs/api/ENDPOINTS.md` y `shifts.http` con respuestas reales (iteración b)
+- [ ] Docs: `docs/api/ENDPOINTS.md` y `shifts.http` con respuestas reales (iteración b2)
+- [ ] E2E con `verify`, incluido Nager.Date inaccesible (iteración b2)
 
 ## Verificación
-Iteración a: build sin warnings, 105 tests verdes. E2E pendiente de (b), incluido el caso con Nager.Date inaccesible.
+Iteración a: build sin warnings, 105 tests verdes. Iteración b1: build sin warnings, 111 tests verdes. E2E pendiente de (b2), incluido el caso con Nager.Date inaccesible.
 
 ## TBDs
-1. Si el modelo gana una región por colaborador, el festivo regional podría filtrarse por `counties` en vez de solo marcarse.
+1. Si el modelo gana una región por colaborador, el festivo regional podría filtrarse por `subdivisionCodes` en vez de solo marcarse.
 
 ## Para la revisión
 - El listado nunca depende de la API externa: un fallo degrada a `Unknown`, no a error (ADR-09).

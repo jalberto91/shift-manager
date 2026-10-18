@@ -17,10 +17,16 @@ public static class DependencyInjection
         services.AddHealthChecks().AddDbContextCheck<AppDbContext>("database");
 
         services.AddMemoryCache();
+        var nagerDateAddress = new Uri(nagerDateBaseUrl);
         services.AddHttpClient<ICountryCatalog, NagerDateCountryCatalog>(client =>
         {
-            client.BaseAddress = new Uri(nagerDateBaseUrl);
+            client.BaseAddress = nagerDateAddress;
             client.Timeout = TimeSpan.FromSeconds(5);
+        });
+        services.AddHttpClient<IHolidayCatalog, NagerDatePublicHolidayCatalog>(client =>
+        {
+            client.BaseAddress = nagerDateAddress;
+            client.Timeout = TimeSpan.FromSeconds(3);
         });
 
         return services;
