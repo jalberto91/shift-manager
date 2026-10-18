@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ShiftManager.Application.Abstractions;
 using ShiftManager.Infrastructure.Countries;
 using ShiftManager.Infrastructure.Persistence;
+using ShiftManager.Infrastructure.Spreadsheets;
 
 namespace ShiftManager.Infrastructure;
 
@@ -14,6 +15,7 @@ public static class DependencyInjection
         services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
         services.AddScoped<ICollaboratorRepository, CollaboratorRepository>();
         services.AddScoped<IShiftRepository, ShiftRepository>();
+        services.AddScoped<IShiftSheetReader, ClosedXmlShiftSheetReader>();
         services.AddHealthChecks().AddDbContextCheck<AppDbContext>("database");
 
         services.AddMemoryCache();

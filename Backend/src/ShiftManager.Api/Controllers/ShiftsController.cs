@@ -5,14 +5,19 @@ using ShiftManager.Application.Shifts;
 using ShiftManager.Application.Shifts.CreateShift;
 using ShiftManager.Application.Shifts.DeleteShift;
 using ShiftManager.Application.Shifts.GetShift;
+using ShiftManager.Application.Shifts.ImportShifts;
 using ShiftManager.Application.Shifts.ListShifts;
 using ShiftManager.Application.Shifts.UpdateShift;
+using ShiftManager.Domain.Common;
+using ShiftManager.Domain.Shifts;
 
 namespace ShiftManager.Api.Controllers;
 
 [Route("api/shifts")]
 public sealed class ShiftsController(IMediator mediator) : ApiControllerBase
 {
+    private const long MaxImportBytes = 5 * 1024 * 1024;
+
     [HttpGet]
     [ProducesResponseType<IReadOnlyList<ShiftListItemDto>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
@@ -46,6 +51,27 @@ public sealed class ShiftsController(IMediator mediator) : ApiControllerBase
         return result.IsSuccess
             ? Created($"/api/shifts/{result.Value.Id}", result.Value)
             : ToProblem(result);
+    }
+
+    [HttpPost("import")]
+    [ProducesResponseType<ImportReportDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Import(IFormFile? file, CancellationToken cancellationToken)
+    {
+        if (file is null)
+        {
+            return ToProblem(Result.Failure(ShiftErrors.InvalidFile));
+        }
+
+        if (file.Length > MaxImportBytes)
+        {
+            return ToProblem(Result.Failure(ShiftErrors.FileTooLarge));
+        }
+
+        await using var content = file.OpenReadStream();
+        var result = await mediator.Send(new ImportShiftsCommand(content), cancellationToken);
+
+        return result.IsSuccess ? Ok(result.Value) : ToProblem(result);
     }
 
     [HttpPut("{id:guid}")]

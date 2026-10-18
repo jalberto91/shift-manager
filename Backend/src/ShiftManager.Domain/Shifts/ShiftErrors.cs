@@ -25,6 +25,9 @@ public static class ShiftErrors
     public static readonly Error InvalidFile = Error.Validation(
         "shift.import.file", "The file is not a readable .xlsx workbook.");
 
+    public static readonly Error FileTooLarge = Error.Validation(
+        "shift.import.file-too-large", "The file exceeds the maximum allowed size.");
+
     public static Error MissingColumns(IEnumerable<string> columns) => Error.Validation(
         "shift.import.columns", $"Missing required columns: {string.Join(", ", columns)}.");
 
