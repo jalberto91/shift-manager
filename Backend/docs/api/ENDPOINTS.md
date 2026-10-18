@@ -9,7 +9,7 @@ Contrato que lee el front. Se actualiza al cerrar cada UC. Las rutas van en ingl
 | UC-03 | POST | `/api/shifts` | Alta de turno (409 si solapa) | hecho |
 | UC-04 | GET/PUT/DELETE | `/api/shifts[/{id}]` | Listar con rango de fechas, leer, editar, borrar | hecho |
 | UC-05 | GET | `/api/shifts` | Incluye marca de festivo | hecho |
-| UC-06 | POST | `/api/shifts/import` | Importar `.xlsx` con informe | pendiente |
+| UC-06 | POST | `/api/shifts/import` | Importar `.xlsx` con informe | hecho |
 | UC-07 | GET | `/api/shifts/export` | Exportar `.xlsx` por rango | pendiente |
 | — | GET | `/health` | Health check (incluye la BD) | hecho |
 
@@ -100,3 +100,45 @@ Cada turno del listado lleva `holiday`, calculado con los festivos de Nager.Date
 - El colaborador solo tiene país, no región: un festivo regional se marca igual, con `isGlobal = false`. Si el mismo día hay uno nacional y uno regional, gana el nacional.
 - Con Nager.Date caído el listado responde `200` con `Unknown` y tarda como máximo unos 3 s (timeout del cliente); el fallo no se guarda, así que la siguiente petición vuelve a intentarlo. Los aciertos se guardan 24 h por país y año.
 - Los turnos de colaboradores dados de baja también se marcan.
+
+## UC-06 · POST /api/shifts/import
+
+Sube un `.xlsx` con turnos y devuelve un informe por fila. `multipart/form-data` con el archivo en el campo `file` (máximo 5 MB). Ejemplos en [shifts.http](shifts.http). [../samples/shifts-import-example.xlsx](../samples/shifts-import-example.xlsx) sirve de plantilla: seis turnos válidos, con la fecha y las horas como celdas de Excel.
+
+**Formato del archivo**
+- Se lee solo la primera hoja. La primera fila es el encabezado; los datos empiezan en la fila 2.
+- Columnas obligatorias: `Email`, `Fecha`, `HoraInicio` y `HoraFin`. Se buscan por nombre, sin importar el orden ni las mayúsculas; las columnas extra se ignoran.
+- `Fecha`: celda de fecha, o texto `yyyy-MM-dd` o `dd/MM/yyyy`. `HoraInicio` y `HoraFin`: celda de hora, o texto `HH:mm`.
+- El colaborador se identifica por `Email` (sin distinguir mayúsculas ni espacios en los bordes) y debe estar activo.
+- Las filas completamente vacías se ignoran.
+
+**Respuesta `200`**, aunque haya filas fallidas. El import es parcial: las filas válidas se guardan y las inválidas se informan. Con la plantilla, la primera vez:
+
+```json
+{ "importedRows": [2, 3, 4, 5, 6, 7], "failedRows": [] }
+```
+
+Con filas inválidas (ejemplo ilustrativo):
+
+```json
+{
+  "importedRows": [2, 3, 4, 8],
+  "failedRows": [
+    { "row": 5, "reasons": ["The shift overlaps an earlier row of the same file."] },
+    { "row": 6, "reasons": ["Collaborator does not exist or is inactive."] },
+    { "row": 7, "reasons": ["End time must be later than start time on the same day."] }
+  ]
+}
+```
+
+`row` es el número de fila de Excel. Cada fila fallida lista todos sus motivos (mensajes, sin código). Si dos filas del archivo se solapan para el mismo colaborador, falla la que viene segunda; el solape contra turnos ya guardados se comprueba igual.
+
+**Errores `400`** (el archivo no se procesa y no se guarda nada):
+
+| Código | Cuándo |
+|---|---|
+| `shift.import.file` | Falta el campo `file`, o el archivo no es un `.xlsx` legible |
+| `shift.import.file-too-large` | El archivo pesa más de 5 MB |
+| `shift.import.columns` | Faltan columnas obligatorias; el mensaje las nombra |
+
+Un archivo muy por encima de los 5 MB (alrededor de 30 MB) lo corta el servidor con `413` antes de llegar a esta validación.

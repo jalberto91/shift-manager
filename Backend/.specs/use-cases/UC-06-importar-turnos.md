@@ -1,5 +1,5 @@
 # UC-06 · Importar turnos desde Excel con informe
-> En curso (a: spec, regla compartida y handler; b: lector ClosedXML, endpoint, docs y E2E) · rama `main` · 2026-10-18 · cubre: R4, R3 · decisiones P5, P7, P8, P9 · ADR-08, ADR-10
+> Hecho (a: spec, regla compartida y handler; b1: lector ClosedXML; b2a: endpoint; b2b: docs, `.xlsx` de ejemplo y E2E) · rama `main` · 2026-10-18 · cubre: R4, R3 · decisiones P5, P7, P8, P9 · ADR-08, ADR-10
 
 ## Requirements
 - Subir un `.xlsx` con turnos y recibir un informe con las filas importadas y las fallidas, con el motivo de cada error.
@@ -10,17 +10,17 @@
 - Límite de tamaño de 5 MB.
 
 Criterios de aceptación:
-- [ ] `POST /api/shifts/import` con un `.xlsx` válido → `200` con `{ importedRows: [2, 3], failedRows: [] }` y los turnos guardados.
-- [ ] Con filas inválidas → `200` con `importedRows` (filas guardadas) y `failedRows` con `{ row, reasons: [...] }` por cada una; las válidas quedan guardadas.
-- [ ] Una fila con varios problemas de forma (p. ej. fecha vacía y fin anterior al inicio) lista todos sus motivos.
-- [ ] Email desconocido o de un colaborador dado de baja → fila fallida `shift.collaborator-unavailable`.
-- [ ] Fecha u hora ilegible, o celda obligatoria vacía → fila fallida `shift.import.cell`, con el nombre de la columna en el mensaje.
-- [ ] Fin no posterior al inicio → fila fallida `shift.time-range` (regla del dominio).
-- [ ] Solape con un turno de la BD → fila fallida con el motivo de `shift.overlap`.
-- [ ] Solape con una fila anterior aceptada del mismo archivo → fila fallida con el motivo "overlaps an earlier row of the same file".
-- [ ] Faltan columnas obligatorias → `400` `shift.import.columns`, nada se guarda.
-- [ ] Archivo que no es un `.xlsx` legible → `400` `shift.import.file`; mayor de 5 MB → `400` `shift.import.file-too-large`.
-- [ ] Sin archivo en el formulario → `400` `shift.import.file`.
+- [x] `POST /api/shifts/import` con un `.xlsx` válido → `200` con `{ importedRows: [2, 3], failedRows: [] }` y los turnos guardados.
+- [x] Con filas inválidas → `200` con `importedRows` (filas guardadas) y `failedRows` con `{ row, reasons: [...] }` por cada una; las válidas quedan guardadas.
+- [x] Una fila con varios problemas de forma (p. ej. fecha vacía y fin anterior al inicio) lista todos sus motivos.
+- [x] Email desconocido o de un colaborador dado de baja → fila fallida `shift.collaborator-unavailable`.
+- [x] Fecha u hora ilegible, o celda obligatoria vacía → fila fallida `shift.import.cell`, con el nombre de la columna en el mensaje.
+- [x] Fin no posterior al inicio → fila fallida `shift.time-range` (regla del dominio).
+- [x] Solape con un turno de la BD → fila fallida con el motivo de `shift.overlap`.
+- [x] Solape con una fila anterior aceptada del mismo archivo → fila fallida con el motivo "overlaps an earlier row of the same file".
+- [x] Faltan columnas obligatorias → `400` `shift.import.columns`, nada se guarda.
+- [x] Archivo que no es un `.xlsx` legible → `400` `shift.import.file`; mayor de 5 MB → `400` `shift.import.file-too-large`.
+- [x] Sin archivo en el formulario → `400` `shift.import.file`.
 
 Casos límite:
 - Filas totalmente vacías se ignoran (no cuentan ni como importadas ni como fallidas).
@@ -90,15 +90,22 @@ Con `Result` en vez de excepciones para cada fila: el informe es un resultado es
 - [x] Infrastructure: `ClosedXmlShiftSheetReader` e instalación de ClosedXML 0.105.1; errores `shift.import.file` y `shift.import.columns` (iteración b1)
 - [x] Tests: lector con celdas fecha/hora vs. texto, columnas en otro orden y mayúsculas, filas vacías, celdas ilegibles, columnas faltantes y archivo que no es `.xlsx` (iteración b1)
 - [x] Api: acción `Import` con límite de 5 MB, `shift.import.file-too-large` y registro del lector en DI (iteración b2a)
-- [ ] Docs: `docs/api/ENDPOINTS.md`, `shifts.http` y `.xlsx` de ejemplo (iteración b2b)
-- [ ] E2E con `verify` y sección Verificación (iteración b2b)
+- [x] Docs: `docs/api/ENDPOINTS.md`, `shifts.http` y `.xlsx` de plantilla en `docs/samples/` (iteración b2b)
+- [x] E2E con `verify` y sección Verificación (iteración b2b)
 
 ## Verificación
-Iteración (a): build sin warnings y 124 tests verdes (112 previos + 12 del handler). Pendiente de (b): `docker compose up --build` y subida del `.xlsx` de ejemplo (iteración b).
+2026-10-18, `docker compose up --build` y curl (`-F file=@...`) contra PostgreSQL, 136 tests verdes y build sin warnings:
+- `docs/samples/shifts-import-example.xlsx` (plantilla: seis turnos válidos, fecha y horas como celdas de Excel): `200` con `importedRows [2,3,4,5,6,7]` y `failedRows []`.
+- Mismo archivo otra vez: `200`, nada importado; las seis filas fallan por solape contra los turnos ya guardados.
+- Archivo de prueba con texto `dd/MM/yyyy`, `yyyy-MM-dd` y `HH:mm`, un solape dentro del archivo, un email desconocido y un fin anterior al inicio (preparado para el E2E, no está en el repo): `importedRows [2,3,4,8]`; fallan la fila 5 (solape con la fila 2), la 6 y la 7.
+- Archivo con columnas en otro orden y en minúsculas, y un email con mayúsculas y espacios: `200`, esa fila se importa; colaborador dado de baja → `shift.collaborator-unavailable`; email vacío, fecha `10 March`, hora `nine` y hora `25:00` → cada una falla en su fila y el mensaje nombra la columna; fila vacía ignorada (la fila siguiente conserva el número de Excel).
+- Faltan columnas → `400` `shift.import.columns` (nombra `HoraInicio, HoraFin`); archivo que no es `.xlsx` → `400` `shift.import.file`; 6 MB → `400` `shift.import.file-too-large`; sin el campo `file` → `400` `shift.import.file`.
+- Sin ejercitar por HTTP: un archivo por encima de ~30 MB (lo corta Kestrel con `413`, documentado).
 
 ## TBDs
 1. Si el negocio necesita importar archivos grandes (miles de filas), habría que consultar los turnos de la BD en lote en vez de uno por fila.
 2. Si el negocio quiere reimportar el mismo archivo sin errores por duplicado, hay que definir qué es un duplicado (hoy cae como solape).
+3. Un `file` ausente y un archivo ilegible comparten el código `shift.import.file` y el mensaje "The file is not a readable .xlsx workbook."; si el front necesita distinguirlos, separar el mensaje.
 
 ## Para la revisión
 - El handler de import no conoce Excel: lee un puerto y se prueba con un fake a mano. ClosedXML vive solo en Infrastructure (ADR-08).

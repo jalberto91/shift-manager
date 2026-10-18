@@ -187,3 +187,69 @@ Content-Type: application/json
 ### UC-04 · Delete a shift
 # Response 204. Repeating it returns 404 (errors: { "shift.not-found": [...] }): the delete is physical.
 DELETE {{baseUrl}}/api/shifts/<shiftId>
+
+### UC-06 · Import shifts from an .xlsx file
+# Columns: Email, Fecha, HoraInicio, HoraFin (any order or case). Dates as date cells or yyyy-MM-dd / dd/MM/yyyy text; times as time cells or HH:mm text.
+# Template: docs/samples/shifts-import-example.xlsx (six valid shifts for the seeded collaborators, 2026-07-06 to 2026-07-08).
+# Response 200, row is the Excel row number:
+# { "importedRows": [2, 3, 4, 5, 6, 7], "failedRows": [] }
+# The response is also 200 when some rows fail; valid rows are saved and the failed ones are reported, for example:
+# {
+#   "importedRows": [2, 3],
+#   "failedRows": [
+#     { "row": 4, "reasons": ["The shift overlaps an earlier row of the same file."] },
+#     { "row": 5, "reasons": ["Collaborator does not exist or is inactive."] },
+#     { "row": 6, "reasons": ["End time must be later than start time on the same day."] }
+#   ]
+# }
+POST {{baseUrl}}/api/shifts/import
+Content-Type: multipart/form-data; boundary=ShiftBoundary
+
+--ShiftBoundary
+Content-Disposition: form-data; name="file"; filename="shifts-import-example.xlsx"
+Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+
+< ../samples/shifts-import-example.xlsx
+--ShiftBoundary--
+
+### UC-06 · Import the same file again
+# Response 200: nothing is imported because every valid row now overlaps the shift saved by the first import.
+# { "importedRows": [], "failedRows": [ { "row": 2, "reasons": ["The shift overlaps another shift of the same collaborator."] }, ... ] }
+POST {{baseUrl}}/api/shifts/import
+Content-Type: multipart/form-data; boundary=ShiftBoundary
+
+--ShiftBoundary
+Content-Disposition: form-data; name="file"; filename="shifts-import-example.xlsx"
+Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+
+< ../samples/shifts-import-example.xlsx
+--ShiftBoundary--
+
+### UC-06 · Import a row that cannot be read
+# Response 200, the row fails and the others are processed. The message names the column:
+# { "row": 5, "reasons": ["Column 'Fecha' is missing or has an unreadable value."] }
+# Same for Email, HoraInicio and HoraFin. A row of a deactivated collaborator fails with shift.collaborator-unavailable.
+
+### UC-06 · Import a file that is not an .xlsx workbook
+# Response 400 (also when the file field is missing):
+# {
+#   "title": "Bad Request", "status": 400,
+#   "detail": "The file is not a readable .xlsx workbook.",
+#   "errors": { "shift.import.file": ["The file is not a readable .xlsx workbook."] },
+#   "traceId": "<id>"
+# }
+POST {{baseUrl}}/api/shifts/import
+Content-Type: multipart/form-data; boundary=ShiftBoundary
+
+--ShiftBoundary
+Content-Disposition: form-data; name="file"; filename="notes.xlsx"
+Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+
+not an xlsx
+--ShiftBoundary--
+
+### UC-06 · Import a file with missing columns
+# Response 400, errors: { "shift.import.columns": ["Missing required columns: HoraInicio, HoraFin."] }
+
+### UC-06 · Import a file larger than 5 MB
+# Response 400, errors: { "shift.import.file-too-large": ["The file exceeds the maximum allowed size."] }
