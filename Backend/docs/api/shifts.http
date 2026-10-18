@@ -60,3 +60,97 @@ POST {{baseUrl}}/api/shifts
 Content-Type: application/json
 
 { "collaboratorId": "<collaboratorId>", "date": "2026-03-10", "startTime": "nope", "endTime": "13:00" }
+
+### UC-04 · List shifts without filter
+# Response 200, ordered by date and start time:
+# [ { "id": "<guid>", "collaboratorId": "<guid>", "date": "2026-04-02", "startTime": "06:00:00", "endTime": "08:00:00" } ]
+GET {{baseUrl}}/api/shifts
+
+### UC-04 · List shifts in a date range (both ends included; either one can be omitted)
+# Response 200
+GET {{baseUrl}}/api/shifts?from=2026-04-01&to=2026-04-30
+
+### UC-04 · List shifts with from later than to
+# Response 400:
+# {
+#   "title": "Bad Request", "status": 400,
+#   "detail": "From date must not be later than to date.",
+#   "errors": { "shift.date-range": ["From date must not be later than to date."] },
+#   "traceId": "<id>"
+# }
+GET {{baseUrl}}/api/shifts?from=2026-04-30&to=2026-04-01
+
+### UC-04 · List shifts with a malformed date
+# Response 400 from the framework binder: the key is the parameter name.
+# errors: { "from": ["The value 'nope' is not valid."] }
+GET {{baseUrl}}/api/shifts?from=nope
+
+### UC-04 · Get a shift
+# Replace <shiftId> with an id from the list.
+# Response 200: { "id": "<guid>", "collaboratorId": "<guid>", "date": "2026-04-02", "startTime": "09:00:00", "endTime": "13:00:00" }
+GET {{baseUrl}}/api/shifts/<shiftId>
+
+### UC-04 · Get an unknown shift
+# Response 404:
+# {
+#   "title": "Not Found", "status": 404,
+#   "detail": "Shift not found.",
+#   "errors": { "shift.not-found": ["Shift not found."] },
+#   "traceId": "<id>"
+# }
+GET {{baseUrl}}/api/shifts/00000000-0000-0000-0000-000000000009
+
+### UC-04 · Update a shift (same body as the create; it does not clash with itself)
+# Response 200 with the updated shift. It can also change the collaborator.
+PUT {{baseUrl}}/api/shifts/<shiftId>
+Content-Type: application/json
+
+{ "collaboratorId": "<collaboratorId>", "date": "2026-04-02", "startTime": "08:00", "endTime": "15:00" }
+
+### UC-04 · Update a shift so it overlaps another one of the same collaborator and day
+# Response 409 (conflictingShiftId is the id of the shift it collides with):
+# {
+#   "title": "Conflict", "status": 409,
+#   "detail": "The shift overlaps another shift of the same collaborator.",
+#   "errors": { "shift.overlap": ["The shift overlaps another shift of the same collaborator."] },
+#   "traceId": "<id>",
+#   "conflictingShiftId": "<guid>"
+# }
+PUT {{baseUrl}}/api/shifts/<shiftId>
+Content-Type: application/json
+
+{ "collaboratorId": "<collaboratorId>", "date": "2026-04-02", "startTime": "07:00", "endTime": "15:00" }
+
+### UC-04 · Update a shift for an unknown or deactivated collaborator
+# Response 400, errors: { "shift.collaborator-unavailable": ["Collaborator does not exist or is inactive."] }
+PUT {{baseUrl}}/api/shifts/<shiftId>
+Content-Type: application/json
+
+{ "collaboratorId": "00000000-0000-0000-0000-000000000001", "date": "2026-04-02", "startTime": "08:00", "endTime": "15:00" }
+
+### UC-04 · Update a shift with several validation errors
+# Response 400:
+# {
+#   "title": "Bad Request", "status": 400,
+#   "detail": "Date is required.",
+#   "errors": {
+#     "shift.date": ["Date is required."],
+#     "shift.time-range": ["End time must be later than start time on the same day."]
+#   },
+#   "traceId": "<id>"
+# }
+PUT {{baseUrl}}/api/shifts/<shiftId>
+Content-Type: application/json
+
+{ "collaboratorId": "<collaboratorId>", "startTime": "13:00", "endTime": "09:00" }
+
+### UC-04 · Update an unknown shift
+# Response 404, errors: { "shift.not-found": ["Shift not found."] }
+PUT {{baseUrl}}/api/shifts/00000000-0000-0000-0000-000000000009
+Content-Type: application/json
+
+{ "collaboratorId": "<collaboratorId>", "date": "2026-04-02", "startTime": "09:00", "endTime": "13:00" }
+
+### UC-04 · Delete a shift
+# Response 204. Repeating it returns 404 (errors: { "shift.not-found": [...] }): the delete is physical.
+DELETE {{baseUrl}}/api/shifts/<shiftId>

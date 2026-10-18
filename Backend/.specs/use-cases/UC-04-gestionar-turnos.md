@@ -1,5 +1,5 @@
 # UC-04 · Listar, leer, editar y borrar turnos
-> En curso (iteración a: spec y dominio; b1: consultas; b2: edición y borrado; c: endpoints, docs y E2E) · rama `main` · 2026-10-17 · cubre: R2 (lectura, edición, borrado), R3 · decisiones P2, P3, P13, P17 · ADR-10
+> Hecho (a: spec y dominio; b1: consultas; b2: edición y borrado; c: endpoints, docs y E2E) · rama `main` · 2026-10-17 · cubre: R2 (lectura, edición, borrado), R3 · decisiones P2, P3, P13, P17 · ADR-10
 
 ## Requirements
 - Listar turnos con filtro opcional por rango de fechas, leer uno por id, editarlo y borrarlo.
@@ -69,11 +69,17 @@ Casos límite:
 - [x] Tests: handlers de consulta con fakes (iteración b1)
 - [x] Application + Infrastructure: `UpdateShift` y `DeleteShift`, `excludingId` y `Remove` (iteración b2)
 - [x] Tests: handlers de edición y borrado con fakes (iteración b2)
-- [ ] Api: acciones de `ShiftsController` y `ShiftRequest` (iteración c)
-- [ ] Docs: `docs/api/ENDPOINTS.md` y `shifts.http` con respuestas reales (iteración c)
+- [x] Api: acciones de `ShiftsController` y `ShiftRequest` (iteración c)
+- [x] Docs: `docs/api/ENDPOINTS.md` y `shifts.http` con respuestas reales (iteración c)
 
 ## Verificación
-Pendiente.
+2026-10-17, `docker compose up --build` y curl contra PostgreSQL, 97 tests verdes:
+- `GET /api/shifts` sin filtro, con `from` solo, `to` solo, ambos y `from == to`: `200`, orden por fecha y hora de inicio, extremos incluidos.
+- `from > to` → `400 shift.date-range`; `from=nope` → `400` del binder (clave `from`).
+- `GET /{id}` → `200`; id desconocido → `404 shift.not-found`.
+- `PUT` con los mismos valores y ampliando dentro del hueco → `200`; solapando con otro turno del día y moviendo a un día ocupado → `409` con `conflictingShiftId`; cambio de colaborador libre → `200`; colaborador inexistente → `400`; cuerpo con varios errores → `400` con `shift.date` y `shift.time-range`; id desconocido → `404`.
+- `DELETE` → `204`, repetido → `404`, y el turno desaparece del listado.
+- Sin ejercitar por la API (cubiertos con fakes): colaborador dado de baja y cambio de colaborador con choque.
 
 ## TBDs
 1. UC-05 debe ampliar `ShiftDto` (o usar uno propio) con la marca de festivo sin romper el contrato de `GET /api/shifts`.

@@ -7,7 +7,7 @@ Contrato que lee el front. Se actualiza al cerrar cada UC. Las rutas van en ingl
 | UC-01 | GET | `/api/collaborators` | Listar colaboradores | hecho |
 | UC-02 | POST/PUT/DELETE | `/api/collaborators[/{id}]` | Alta, edición, baja lógica | hecho |
 | UC-03 | POST | `/api/shifts` | Alta de turno (409 si solapa) | hecho |
-| UC-04 | GET/PUT/DELETE | `/api/shifts[/{id}]` | Listar con rango de fechas, leer, editar, borrar | pendiente |
+| UC-04 | GET/PUT/DELETE | `/api/shifts[/{id}]` | Listar con rango de fechas, leer, editar, borrar | hecho |
 | UC-05 | GET | `/api/shifts` | Incluye marca de festivo | pendiente |
 | UC-06 | POST | `/api/shifts/import` | Importar `.xlsx` con informe | pendiente |
 | UC-07 | GET | `/api/shifts/export` | Exportar `.xlsx` por rango | pendiente |
@@ -61,4 +61,23 @@ Un colaborador no puede tener dos turnos que se solapen el mismo día. Los inter
 | `shift.collaborator-unavailable` | 400 | El colaborador no existe o está dado de baja |
 | `shift.overlap` | 409 | Choca con otro turno del colaborador; `conflictingShiftId` trae el id del turno con el que choca |
 
-Un valor con formato inválido (por ejemplo `"startTime": "nope"`) lo rechaza el binder del framework con `400` antes del caso de uso, y la clave de `errors` es la ruta JSON (`$.startTime`), no un código de negocio. El `Location` apunta a un recurso que aún no tiene `GET /{id}` (llega con UC-04).
+Un valor con formato inválido (por ejemplo `"startTime": "nope"`) lo rechaza el binder del framework con `400` antes del caso de uso, y la clave de `errors` es la ruta JSON (`$.startTime`), no un código de negocio.
+## UC-04 · GET, PUT y DELETE /api/shifts
+
+Ejemplos en [shifts.http](shifts.http). `PUT` recibe el mismo cuerpo que el alta y aplica las mismas reglas y los mismos errores de UC-03; el propio turno no cuenta como solape, así que dejarlo igual o ajustarlo dentro de su hueco es válido. Puede cambiar de colaborador, que debe existir y estar activo.
+
+| Acción | Éxito | Errores |
+|---|---|---|
+| `GET /api/shifts?from=yyyy-MM-dd&to=yyyy-MM-dd` | `200` con la lista, ordenada por fecha y hora de inicio | `400` |
+| `GET /api/shifts/{id}` | `200` con el turno | `404` |
+| `PUT /api/shifts/{id}` | `200` con el turno | `400`, `404`, `409` |
+| `DELETE /api/shifts/{id}` | `204` | `404` |
+
+`from` y `to` son opcionales, se pueden usar por separado y ambos extremos se incluyen. Sin paginación. Los turnos de colaboradores dados de baja se siguen listando y leyendo, pero no se pueden editar. El borrado es físico, por lo que repetirlo da `404`.
+
+| Código | HTTP | Cuándo |
+|---|---|---|
+| `shift.date-range` | 400 | `from` es posterior a `to` |
+| `shift.not-found` | 404 | El `id` no existe |
+
+Un `from` o `to` con formato inválido lo rechaza el binder con `400` y la clave de `errors` es el nombre del parámetro (`from`, `to`).
