@@ -15,6 +15,11 @@ internal sealed class FakeCollaboratorRepository : ICollaboratorRepository
     public Task<Collaborator?> GetByIdAsync(Guid id, CancellationToken cancellationToken) =>
         Task.FromResult(Stored.FirstOrDefault(c => c.Id == id));
 
+    public Task<IReadOnlyDictionary<Guid, string>> GetCountryCodesAsync(
+        IReadOnlyCollection<Guid> ids, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyDictionary<Guid, string>>(
+            Stored.Where(c => ids.Contains(c.Id)).ToDictionary(c => c.Id, c => c.CountryCode));
+
     public Task<bool> EmailExistsAsync(string email, Guid? excludingId, CancellationToken cancellationToken) =>
         Task.FromResult(Stored.Any(c => c.Email == email && c.Id != excludingId));
 

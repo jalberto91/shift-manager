@@ -13,7 +13,7 @@ namespace ShiftManager.Api.Controllers;
 public sealed class ShiftsController(IMediator mediator) : ApiControllerBase
 {
     [HttpGet]
-    [ProducesResponseType<IReadOnlyList<ShiftDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<IReadOnlyList<ShiftListItemDto>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> List(DateOnly? from, DateOnly? to, CancellationToken cancellationToken)
     {
