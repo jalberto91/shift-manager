@@ -4,10 +4,10 @@
 Iteraciones chicas. Al terminar cada una: **parar**, mostrar archivos tocados, sugerir mensaje de commit (Conventional Commits, **en inglés**, con scope) y **esperar "seguí"**. El usuario commitea a mano. Nunca encadenar dos iteraciones sin "seguí". Si una crece más de lo previsto, cortarla en dos antes de seguir.
 
 ## ⏭️ Próximo paso
-UC-03 está cerrado a falta del commit de (c). Siguiente: `/handoff` para archivar el bloque y luego **UC-04** (listar, leer, editar y borrar turnos con filtro por rango de fechas; editar excluye el propio turno): crear su spec desde `_TEMPLATE-UC.md`, agregando `excludingId` a `IShiftRepository` y reutilizando `Shift.OverlapsWith`. Los reintentos de ADR-09 (resilience) quedan para el cliente de festivos.
+**UC-04** (listar, leer, editar y borrar turnos con filtro por rango de fechas; R2, R3; P13 sin paginación). Aún no hay spec: crear `.specs/use-cases/UC-04-gestionar-turnos.md` desde `_TEMPLATE-UC.md`, leyendo antes `00-requisitos.md` (fila UC-04, P13) y `UC-03-alta-de-turno.md` (Design). Puntos a resolver en el spec: `excludingId` en `IShiftRepository` para que editar no choque consigo mismo, `Shift.Update` reutilizando la validación de `Create`, el `GET /{id}` que el `Location` de UC-03 ya apunta, y qué hace editar con un colaborador dado de baja. Los reintentos de ADR-09 (resilience) quedan para el cliente de festivos.
 
 ## Dónde estamos
-- Fases 1 y 2, **UC-01 y UC-02 completos** y commiteados; UC-03 (a) y (b) commiteadas y (c) en el working tree.
+- Fases 1 y 2, **UC-01, UC-02 y UC-03 completos** y commiteados (último código: `10471c9`). Árbol limpio hasta este handoff.
 - Build sin warnings, 75 tests verdes. `docker compose up` verificado con las 4 migraciones sobre la semilla (API en `localhost:5080`, BD en `127.0.0.1:5433`), con los endpoints de colaboradores y `POST /api/shifts` ejercitados. Quedan en la BD de pruebas turnos del 2026-03-10 de Ana y Bruno, y colaboradores dados de baja (`test.user@…`, `temp.baja@…`); `docker compose down -v` los limpia. La API sigue levantada en el compose.
 - Existen las migraciones `InitialCreate`, `AddCollaboratorIsActive`, `AddCollaboratorEmailUniqueIndex` y `AddShifts`, y la semilla de 5 colaboradores.
 - `ICountryCatalog` tiene implementación (`NagerDateCountryCatalog`, config `NagerDate:BaseUrl`). `dotnet-ef` 9.0.21 es herramienta local (`.config/dotnet-tools.json`): `dotnet dotnet-ef`.
@@ -24,7 +24,7 @@ UC-03 está cerrado a falta del commit de (c). Siguiente: `/handoff` para archiv
 - pgAdmin de escritorio en Windows: host `127.0.0.1` y `GSS encryption mode = disable` (ver skill `verify`).
 
 ## Bloque en curso
-UC-02 cerrado y archivado. UC-03: (a) y (b) commiteadas (`857f2df`, `36c1c56`); (c) hecha (persistencia, migración `AddShifts`, `POST /api/shifts`, docs, `shifts.http` y E2E), pendiente de commit y de archivar. Ninguna iteración abierta.
+UC-03 cerrado y archivado. UC-04 sin empezar. Ninguna iteración abierta.
 
 ## Abierto / pendientes con terceros
 - ADR-08 (Excel: ClosedXML vs MiniExcel) pendiente de `license-check`.
@@ -41,6 +41,7 @@ UC-02 cerrado y archivado. UC-03: (a) y (b) commiteadas (`857f2df`, `36c1c56`); 
 - [ ] Revisión contra "qué valoran" (`00-requisitos.md` §2)
 
 ## Cerrado recientemente
+- 2026-10-17 · UC-03: alta de turno con regla de no solape, persistencia y `POST /api/shifts` → [historial](historial/2026-10-17-uc03-alta-de-turno.md)
 - 2026-10-17 · UC-02 (c): `ENDPOINTS.md`, `.http` con respuestas reales, E2E y cierre del UC → [historial](historial/2026-10-17-uc02-c-docs-y-cierre.md)
 - 2026-10-17 · UC-02 (b2): acciones `POST`/`PUT`/`DELETE` de colaboradores y `CollaboratorRequest` → [historial](historial/2026-10-17-uc02-b2-endpoints.md)
 - 2026-10-17 · UC-02 (b1): casos de uso de escritura, índice único de email y catálogo de países Nager.Date → [historial](historial/2026-10-17-uc02-b1-casos-de-uso.md)
