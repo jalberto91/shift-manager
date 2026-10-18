@@ -1,5 +1,5 @@
 # UC-07 · Exportar turnos por rango a Excel
-> En curso (a: spec, puerto de escritura y handler; b: escritor ClosedXML, endpoint, docs y E2E) · rama `main` · 2026-10-18 · cubre: R5 · decisiones P9 (formato de celdas) · ADR-08
+> Completo (a: spec, puerto de escritura y handler; b1: escritor ClosedXML; b2: endpoint, docs y E2E) · rama `main` · 2026-10-18 · cubre: R5 · decisiones P9 (formato de celdas) · ADR-08
 
 ## Requirements
 - Descargar un `.xlsx` con los turnos de un rango de fechas (R5).
@@ -7,13 +7,13 @@
 - El archivo usa las mismas columnas que el import (UC-06), así que lo exportado se puede volver a importar.
 
 Criterios de aceptación:
-- [ ] `GET /api/shifts/export?from=2026-03-01&to=2026-03-31` → `200` con un `.xlsx` que trae solo los turnos con `from <= date <= to`.
-- [ ] Sin `from` ni `to` → todos los turnos.
-- [ ] Una fila por turno con `Email`, `Fecha`, `HoraInicio` y `HoraFin`, ordenadas por fecha y hora de inicio.
-- [ ] `Fecha` y las horas son celdas reales de Excel (no texto), con formato `yyyy-mm-dd` y `hh:mm`.
-- [ ] `from` posterior a `to` → `400` `shift.date-range`.
-- [ ] Rango sin turnos → `200` con un archivo que solo tiene el encabezado.
-- [ ] El archivo exportado se importa con el import de UC-06 (en una BD vacía de esos turnos).
+- [x] `GET /api/shifts/export?from=2026-03-01&to=2026-03-31` → `200` con un `.xlsx` que trae solo los turnos con `from <= date <= to`.
+- [x] Sin `from` ni `to` → todos los turnos.
+- [x] Una fila por turno con `Email`, `Fecha`, `HoraInicio` y `HoraFin`, ordenadas por fecha y hora de inicio.
+- [x] `Fecha` y las horas son celdas reales de Excel (no texto), con formato `yyyy-mm-dd` y `hh:mm`.
+- [x] `from` posterior a `to` → `400` `shift.date-range`.
+- [x] Rango sin turnos → `200` con un archivo que solo tiene el encabezado.
+- [x] El archivo exportado se importa con el import de UC-06 (en una BD vacía de esos turnos).
 
 Casos límite:
 - Los turnos de colaboradores dados de baja se exportan (son historial, ADR-11).
@@ -59,12 +59,12 @@ No reutiliza `ListShiftsHandler`: ese consulta festivos a Nager.Date, que el exp
 - [x] Tests: handler con fake del escritor (filas con email, rango con extremos incluidos, `from > to`, rango vacío, colaborador dado de baja) (iteración a)
 - [x] Infrastructure: `ClosedXmlShiftSheetWriter` y su registro en DI (iteración b1)
 - [x] Tests: escritor con ida y vuelta contra `ClosedXmlShiftSheetReader` (iteración b1)
-- [ ] Api: acción `Export` (iteración b)
-- [ ] Docs: `docs/api/ENDPOINTS.md` y `shifts.http` con la forma de descargar (`curl -o`) (iteración b)
-- [ ] E2E con `verify` y sección Verificación (iteración b)
+- [x] Api: acción `Export` (iteración b2)
+- [x] Docs: `docs/api/ENDPOINTS.md` y `shifts.http` con la forma de descargar (`curl -o`) (iteración b2)
+- [x] E2E con `verify` y sección Verificación (iteración b2)
 
 ## Verificación
-Iteración (a): build sin warnings y 141 tests verdes (136 previos + 5 del handler). Pendiente de (b): escritor, endpoint y E2E con `docker compose up --build`. Aceptado: hasta que (b) registre `IShiftSheetWriter`, la API no arranca en Development (la validación de DI al construir el host falla por `ExportShiftsHandler`); en Production no se valida al arrancar.
+Build sin warnings y 145 tests verdes (141 de (a) + 4 del escritor). E2E con `docker compose up --build` sobre la BD de pruebas (22 turnos): sin filtro 22 filas; `from=2026-03-01&to=2026-03-31` 3 filas, las mismas que el listado; un solo día (`2026-02-28`) 1 fila; rango sin turnos solo encabezado; `from > to` `400` con `shift.date-range`; `from=xx` `400` del binder. Cabeceras: `Content-Type` xlsx y `Content-Disposition: attachment; filename=shifts.xlsx`. El archivo completo se reimporta: las 22 filas se leen y fallan solo por solape (los turnos ya existen). La API arranca en Development en cuanto hay BD (la validación de DI ya pasa).
 
 ## TBDs
 1. Si el front necesita el nombre del colaborador o la marca de festivo en el archivo, hay que ampliar las columnas (hoy exactamente las del import).

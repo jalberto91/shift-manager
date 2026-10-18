@@ -253,3 +253,22 @@ not an xlsx
 
 ### UC-06 · Import a file larger than 5 MB
 # Response 400, errors: { "shift.import.file-too-large": ["The file exceeds the maximum allowed size."] }
+
+### UC-07 · Export shifts of a range to .xlsx
+# Response 200, Content-Disposition: attachment; filename="shifts.xlsx". Both bounds are inclusive and optional.
+# To save the file: curl -o shifts.xlsx "http://localhost:5080/api/shifts/export?from=2026-03-01&to=2026-03-31"
+GET {{baseUrl}}/api/shifts/export?from=2026-03-01&to=2026-03-31
+
+### UC-07 · Export every shift
+# Response 200, same file without the date filter.
+GET {{baseUrl}}/api/shifts/export
+
+### UC-07 · Export with from after to
+# Response 400:
+# {
+#   "title": "Bad Request", "status": 400,
+#   "detail": "<message>",
+#   "errors": { "shift.date-range": ["<message>"] },
+#   "traceId": "<id>"
+# }
+GET {{baseUrl}}/api/shifts/export?from=2026-04-01&to=2026-03-01

@@ -4,6 +4,7 @@ using ShiftManager.Api.Contracts;
 using ShiftManager.Application.Shifts;
 using ShiftManager.Application.Shifts.CreateShift;
 using ShiftManager.Application.Shifts.DeleteShift;
+using ShiftManager.Application.Shifts.ExportShifts;
 using ShiftManager.Application.Shifts.GetShift;
 using ShiftManager.Application.Shifts.ImportShifts;
 using ShiftManager.Application.Shifts.ListShifts;
@@ -17,6 +18,7 @@ namespace ShiftManager.Api.Controllers;
 public sealed class ShiftsController(IMediator mediator) : ApiControllerBase
 {
     private const long MaxImportBytes = 5 * 1024 * 1024;
+    private const string XlsxContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
     [HttpGet]
     [ProducesResponseType<IReadOnlyList<ShiftListItemDto>>(StatusCodes.Status200OK)]
@@ -26,6 +28,17 @@ public sealed class ShiftsController(IMediator mediator) : ApiControllerBase
         var result = await mediator.Send(new ListShiftsQuery(from, to), cancellationToken);
 
         return result.IsSuccess ? Ok(result.Value) : ToProblem(result);
+    }
+
+    [HttpGet("export")]
+    [Produces(XlsxContentType)]
+    [ProducesResponseType<byte[]>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Export(DateOnly? from, DateOnly? to, CancellationToken cancellationToken)
+    {
+        var result = await mediator.Send(new ExportShiftsQuery(from, to), cancellationToken);
+
+        return result.IsSuccess ? File(result.Value, XlsxContentType, "shifts.xlsx") : ToProblem(result);
     }
 
     [HttpGet("{id:guid}")]

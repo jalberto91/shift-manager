@@ -10,7 +10,7 @@ Contrato que lee el front. Se actualiza al cerrar cada UC. Las rutas van en ingl
 | UC-04 | GET/PUT/DELETE | `/api/shifts[/{id}]` | Listar con rango de fechas, leer, editar, borrar | hecho |
 | UC-05 | GET | `/api/shifts` | Incluye marca de festivo | hecho |
 | UC-06 | POST | `/api/shifts/import` | Importar `.xlsx` con informe | hecho |
-| UC-07 | GET | `/api/shifts/export` | Exportar `.xlsx` por rango | pendiente |
+| UC-07 | GET | `/api/shifts/export` | Exportar `.xlsx` por rango | hecho |
 | — | GET | `/health` | Health check (incluye la BD) | hecho |
 
 Las rutas son provisionales hasta cerrar cada UC.
@@ -142,3 +142,23 @@ Con filas inválidas (ejemplo ilustrativo):
 | `shift.import.columns` | Faltan columnas obligatorias; el mensaje las nombra |
 
 Un archivo muy por encima de los 5 MB (alrededor de 30 MB) lo corta el servidor con `413` antes de llegar a esta validación.
+
+## UC-07 · GET /api/shifts/export
+
+Descarga un `.xlsx` con los turnos de un rango. Query opcional `from` y `to` (`yyyy-MM-dd`, extremos incluidos, uno solo vale; sin ninguno exporta todos). Ejemplos en [shifts.http](shifts.http). Para guardar el archivo: `curl -o shifts.xlsx "http://localhost:5080/api/shifts/export?from=2026-03-01&to=2026-03-31"`.
+
+**Respuesta `200`**: `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet` con `Content-Disposition: attachment; filename="shifts.xlsx"` (nombre fijo).
+
+**Formato del archivo**
+- Hoja `Shifts`; fila 1 con el encabezado `Email`, `Fecha`, `HoraInicio`, `HoraFin`, en negrita. Son las mismas columnas del import, así que el archivo se puede volver a importar.
+- Una fila por turno, ordenadas por fecha y hora de inicio. `Fecha` y las horas son celdas de Excel con formato `yyyy-mm-dd` y `hh:mm`.
+- Incluye los turnos de colaboradores dados de baja. No lleva marca de festivo.
+- Un rango sin turnos devuelve un archivo con solo el encabezado.
+
+**Errores `400`**
+
+| Código | Cuándo |
+|---|---|
+| `shift.date-range` | `from` es posterior a `to` |
+
+Un `from` o `to` con formato inválido lo rechaza el binder con `400`, igual que en el listado.
