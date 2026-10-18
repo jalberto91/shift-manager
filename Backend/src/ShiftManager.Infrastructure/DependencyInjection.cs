@@ -13,6 +13,7 @@ public static class DependencyInjection
     {
         services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
         services.AddScoped<ICollaboratorRepository, CollaboratorRepository>();
+        services.AddScoped<IShiftRepository, ShiftRepository>();
         services.AddHealthChecks().AddDbContextCheck<AppDbContext>("database");
 
         services.AddMemoryCache();

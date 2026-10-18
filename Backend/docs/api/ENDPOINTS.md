@@ -6,7 +6,7 @@ Contrato que lee el front. Se actualiza al cerrar cada UC. Las rutas van en ingl
 |---|---|---|---|---|
 | UC-01 | GET | `/api/collaborators` | Listar colaboradores | hecho |
 | UC-02 | POST/PUT/DELETE | `/api/collaborators[/{id}]` | Alta, edición, baja lógica | hecho |
-| UC-03 | POST | `/api/shifts` | Alta de turno (409 si solapa) | pendiente |
+| UC-03 | POST | `/api/shifts` | Alta de turno (409 si solapa) | hecho |
 | UC-04 | GET/PUT/DELETE | `/api/shifts[/{id}]` | Listar con rango de fechas, leer, editar, borrar | pendiente |
 | UC-05 | GET | `/api/shifts` | Incluye marca de festivo | pendiente |
 | UC-06 | POST | `/api/shifts/import` | Importar `.xlsx` con informe | pendiente |
@@ -47,3 +47,18 @@ Códigos de `errors` (formato en [ERROR-HANDLING.md](ERROR-HANDLING.md)):
 | `collaborator.not-found` | 404 | El `id` no existe |
 
 La baja es lógica (ADR-11): el colaborador deja de aparecer en el listado, conserva sus turnos y su email sigue ocupado. El `Location` del `POST` apunta a un recurso que aún no tiene `GET /{id}`.
+
+## UC-03 · POST /api/shifts
+
+Body: `{ "collaboratorId": "<guid>", "date": "2026-03-10", "startTime": "09:00", "endTime": "13:00" }`. Fecha `yyyy-MM-dd`; horas `HH:mm` o `HH:mm:ss` (en la respuesta salen como `HH:mm:ss`). Devuelve `201` con el turno y `Location: /api/shifts/{id}`. Ejemplos en [shifts.http](shifts.http).
+
+Un colaborador no puede tener dos turnos que se solapen el mismo día. Los intervalos son semiabiertos: 09:00-13:00 y 13:00-17:00 no se solapan. El turno no cruza la medianoche: `endTime` debe ser posterior a `startTime`.
+
+| Código | HTTP | Cuándo |
+|---|---|---|
+| `shift.date` | 400 | Falta la fecha |
+| `shift.time-range` | 400 | `endTime` no es posterior a `startTime` |
+| `shift.collaborator-unavailable` | 400 | El colaborador no existe o está dado de baja |
+| `shift.overlap` | 409 | Choca con otro turno del colaborador; `conflictingShiftId` trae el id del turno con el que choca |
+
+Un valor con formato inválido (por ejemplo `"startTime": "nope"`) lo rechaza el binder del framework con `400` antes del caso de uso, y la clave de `errors` es la ruta JSON (`$.startTime`), no un código de negocio. El `Location` apunta a un recurso que aún no tiene `GET /{id}` (llega con UC-04).

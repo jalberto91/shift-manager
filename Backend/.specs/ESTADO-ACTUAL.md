@@ -4,12 +4,12 @@
 Iteraciones chicas. Al terminar cada una: **parar**, mostrar archivos tocados, sugerir mensaje de commit (Conventional Commits, **en inglés**, con scope) y **esperar "seguí"**. El usuario commitea a mano. Nunca encadenar dos iteraciones sin "seguí". Si una crece más de lo previsto, cortarla en dos antes de seguir.
 
 ## ⏭️ Próximo paso
-**UC-03 (c)**: según `.specs/use-cases/UC-03-alta-de-turno.md` (Design, "Capas previstas"): `ShiftConfiguration`, `ShiftRepository` (registrar en `Infrastructure/DependencyInjection.cs`), `DbSet<Shift>`, migración `AddShifts`, `ShiftsController` + `CreateShiftRequest`, docs, `.http` y E2E. Ojo: con (b) sin (c), `IShiftRepository` no tiene implementación registrada y la API puede no arrancar (el contenedor valida los handlers en Development). Alternativa opcional antes de UC-03: mapear la carrera del email único a `409` (TBD 3 de UC-02). Los reintentos de ADR-09 (resilience) quedan para el cliente de festivos.
+UC-03 está cerrado a falta del commit de (c). Siguiente: `/handoff` para archivar el bloque y luego **UC-04** (listar, leer, editar y borrar turnos con filtro por rango de fechas; editar excluye el propio turno): crear su spec desde `_TEMPLATE-UC.md`, agregando `excludingId` a `IShiftRepository` y reutilizando `Shift.OverlapsWith`. Los reintentos de ADR-09 (resilience) quedan para el cliente de festivos.
 
 ## Dónde estamos
-- Fases 1 y 2, **UC-01 y UC-02 completos** y commiteados (último código: `e75456c`; docs de cierre: `b7a03c5`). Árbol limpio hasta este handoff.
-- Build sin warnings, 52 tests verdes. `docker compose up` verificado con las 3 migraciones sobre la semilla (API en `localhost:5080`, BD en `127.0.0.1:5433`) y los 4 endpoints de colaboradores ejercitados, con docs y `.http`. Quedó en la BD el colaborador `test.user@example.com` dado de baja (su email sigue ocupado; `docker compose down -v` lo limpia) y la API sigue levantada en el compose.
-- Existen las migraciones `InitialCreate`, `AddCollaboratorIsActive` y `AddCollaboratorEmailUniqueIndex`, y la semilla de 5 colaboradores.
+- Fases 1 y 2, **UC-01 y UC-02 completos** y commiteados; UC-03 (a) y (b) commiteadas y (c) en el working tree.
+- Build sin warnings, 75 tests verdes. `docker compose up` verificado con las 4 migraciones sobre la semilla (API en `localhost:5080`, BD en `127.0.0.1:5433`), con los endpoints de colaboradores y `POST /api/shifts` ejercitados. Quedan en la BD de pruebas turnos del 2026-03-10 de Ana y Bruno, y colaboradores dados de baja (`test.user@…`, `temp.baja@…`); `docker compose down -v` los limpia. La API sigue levantada en el compose.
+- Existen las migraciones `InitialCreate`, `AddCollaboratorIsActive`, `AddCollaboratorEmailUniqueIndex` y `AddShifts`, y la semilla de 5 colaboradores.
 - `ICountryCatalog` tiene implementación (`NagerDateCountryCatalog`, config `NagerDate:BaseUrl`). `dotnet-ef` 9.0.21 es herramienta local (`.config/dotnet-tools.json`): `dotnet dotnet-ef`.
 - Migrar con `dotnet dotnet-ef migrations add <Name> --project src/ShiftManager.Infrastructure --startup-project src/ShiftManager.Api --output-dir Persistence/Migrations`. El `HostAbortedException` que imprime es ruido normal de las herramientas.
 
@@ -24,12 +24,12 @@ Iteraciones chicas. Al terminar cada una: **parar**, mostrar archivos tocados, s
 - pgAdmin de escritorio en Windows: host `127.0.0.1` y `GSS encryption mode = disable` (ver skill `verify`).
 
 ## Bloque en curso
-UC-02 cerrado y archivado. UC-03: spec aprobado y (a) commiteada (`857f2df`); (b) hecha (`CreateShift`, `IShiftRepository`, tests con fakes, 75 tests verdes), pendiente de commit. (c) pendiente. Ninguna iteración abierta.
+UC-02 cerrado y archivado. UC-03: (a) y (b) commiteadas (`857f2df`, `36c1c56`); (c) hecha (persistencia, migración `AddShifts`, `POST /api/shifts`, docs, `shifts.http` y E2E), pendiente de commit y de archivar. Ninguna iteración abierta.
 
 ## Abierto / pendientes con terceros
 - ADR-08 (Excel: ClosedXML vs MiniExcel) pendiente de `license-check`.
 - P5: email normalizado a minúsculas + índice único incluyendo inactivos (ADR-11); el índice ya existe (b1).
-- Carrera en el índice único de email: hoy da `DbUpdateException` y `500`; mapearla a `409` es el TBD 3 de UC-02 (iteración opcional).
+- Carreras de concurrencia **aceptadas para el demo, no se harán**: email único simultáneo (`DbUpdateException` y `500`, TBD 3 de UC-02) y altas de turnos solapados simultáneas (TBD 1 de UC-03). Van a "qué quedó fuera" del README.
 - Regla de código: un tipo por archivo. Pendiente separar `Domain/Common/Error.cs`, `Domain/Common/Result.cs` y `tests/.../Application/Fakes.cs` (iteración aparte, a confirmar).
 - Cuando el front entre al compose, ajustar `Cors__AllowedOrigins__0` al puerto que publique.
 

@@ -1,5 +1,5 @@
 # UC-03 · Alta de turno con regla de no solape
-> En curso (iteración a: spec, dominio y tests de la regla; b: caso de uso con fakes; c: persistencia, endpoint, docs y E2E) · rama `main` · 2026-10-17 · cubre: R2 (alta), R3 · decisiones P2, P3, P12, P17 · ADR-10
+> Cerrado (iteración a: spec, dominio y tests de la regla; b: caso de uso con fakes; c: persistencia, endpoint, docs y E2E) · rama `main` · 2026-10-17 · cubre: R2 (alta), R3 · decisiones P2, P3, P12, P17 · ADR-10
 
 ## Requirements
 - Crear un turno con `collaboratorId`, `date`, `startTime` y `endTime`.
@@ -59,15 +59,20 @@ Casos límite de la regla (cada uno es un test):
 - [x] Tests: dominio, casos límite de la regla (iteración a)
 - [x] Application: `CreateShift`, `ShiftDto` y puerto `IShiftRepository` (iteración b; `shift.collaborator-unavailable` agregado aquí)
 - [x] Tests: handler con fakes (iteración b)
-- [ ] Infrastructure: configuración, repositorio, migración `AddShifts` (iteración c)
-- [ ] Api: `ShiftsController` y `CreateShiftRequest` (iteración c)
-- [ ] Docs: `docs/api/ENDPOINTS.md` y `.http` con respuestas reales (iteración c)
+- [x] Infrastructure: configuración, repositorio, migración `AddShifts` (iteración c)
+- [x] Api: `ShiftsController` y `CreateShiftRequest` (iteración c)
+- [x] Docs: `docs/api/ENDPOINTS.md` y `docs/api/shifts.http` con respuestas reales (iteración c)
 
 ## Verificación
-Pendiente.
+2026-10-17, `docker compose up --build` (la migración `AddShifts` se aplicó al arrancar), ejercitado con curl:
+- `POST`: `201` con `Location`; `409` `shift.overlap` con `conflictingShiftId` igual al id del turno existente; `201` al tocarse en el borde (09:00-13:00 y 13:00-17:00); `201` para otro colaborador a las mismas horas.
+- `400` con `shift.date` y `shift.time-range` a la vez; `400` `shift.collaborator-unavailable` con un id inexistente y con un colaborador dado de baja.
+- Hora mal formada (`"nope"`): `400` del binder del framework, con la ruta JSON como clave de `errors`.
+- Build sin warnings y 75 tests verdes.
 
 ## TBDs
-1. Carrera entre dos altas solapadas simultáneas: ambas pasan la comprobación del handler y las dos se guardan. La red de seguridad sería una restricción de exclusión de PostgreSQL (`btree_gist`); queda fuera de v1 y va a "qué quedó fuera".
+1. Carrera entre dos altas solapadas simultáneas: ambas pasan la comprobación del handler y las dos se guardan. La red de seguridad sería una restricción de exclusión de PostgreSQL (`btree_gist`); queda fuera de v1: límite aceptado para el demo, va a "qué quedó fuera".
+2. Formato inválido de fecha u hora: lo rechaza el binder con `400` y la ruta JSON como clave, fuera del contrato de códigos de negocio. Se acepta en v1; unificarlo exigiría un filtro propio.
 
 ## Para la revisión
 - La regla de solape se escribe una sola vez, en `Shift.OverlapsWith`, y se prueba sin base de datos; el repositorio solo trae los turnos del día.

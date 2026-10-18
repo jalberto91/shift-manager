@@ -1,0 +1,62 @@
+@baseUrl = http://localhost:5080
+
+### UC-03 · Create shift
+# Replace <collaboratorId> with an id from GET /api/collaborators.
+# Response 201, Location: /api/shifts/<id>
+# { "id": "<guid>", "collaboratorId": "<guid>", "date": "2026-03-10", "startTime": "09:00:00", "endTime": "13:00:00" }
+POST {{baseUrl}}/api/shifts
+Content-Type: application/json
+
+{ "collaboratorId": "<collaboratorId>", "date": "2026-03-10", "startTime": "09:00", "endTime": "13:00" }
+
+### UC-03 · Create shift that overlaps another one of the same collaborator and day
+# Response 409 (conflictingShiftId is the id of the shift it collides with):
+# {
+#   "title": "Conflict", "status": 409,
+#   "detail": "The shift overlaps another shift of the same collaborator.",
+#   "errors": { "shift.overlap": ["The shift overlaps another shift of the same collaborator."] },
+#   "traceId": "<id>",
+#   "conflictingShiftId": "<guid>"
+# }
+POST {{baseUrl}}/api/shifts
+Content-Type: application/json
+
+{ "collaboratorId": "<collaboratorId>", "date": "2026-03-10", "startTime": "12:00", "endTime": "16:00" }
+
+### UC-03 · Create shift that only touches the boundary of the previous one
+# Response 201: intervals are half-open, so 09:00-13:00 and 13:00-17:00 do not overlap.
+POST {{baseUrl}}/api/shifts
+Content-Type: application/json
+
+{ "collaboratorId": "<collaboratorId>", "date": "2026-03-10", "startTime": "13:00", "endTime": "17:00" }
+
+### UC-03 · Create shift with several validation errors
+# Response 400 (the first error sets detail):
+# {
+#   "title": "Bad Request", "status": 400,
+#   "detail": "Date is required.",
+#   "errors": {
+#     "shift.date": ["Date is required."],
+#     "shift.time-range": ["End time must be later than start time on the same day."]
+#   },
+#   "traceId": "<id>"
+# }
+POST {{baseUrl}}/api/shifts
+Content-Type: application/json
+
+{ "collaboratorId": "<collaboratorId>", "startTime": "13:00", "endTime": "09:00" }
+
+### UC-03 · Create shift for an unknown or deactivated collaborator
+# Response 400, errors: { "shift.collaborator-unavailable": ["Collaborator does not exist or is inactive."] }
+POST {{baseUrl}}/api/shifts
+Content-Type: application/json
+
+{ "collaboratorId": "00000000-0000-0000-0000-000000000001", "date": "2026-03-10", "startTime": "09:00", "endTime": "13:00" }
+
+### UC-03 · Create shift with a malformed time
+# Response 400 from the framework binder, before the use case runs: the key is the JSON path, not a business code.
+# errors: { "$.startTime": ["The JSON value could not be converted to ..."] }
+POST {{baseUrl}}/api/shifts
+Content-Type: application/json
+
+{ "collaboratorId": "<collaboratorId>", "date": "2026-03-10", "startTime": "nope", "endTime": "13:00" }

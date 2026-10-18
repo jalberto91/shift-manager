@@ -75,7 +75,7 @@ Casos límite:
 ## TBDs
 1. Reactivar un colaborador dado de baja o reutilizar su email: fuera de v1. UC-06 (import por email) debe decidir qué hace si el email pertenece a un inactivo.
 2. UC-03 debe rechazar turnos nuevos para colaboradores inactivos.
-3. Carrera en el índice único de email: dos altas simultáneas con el mismo email pasan la consulta del handler y la segunda falla en el índice con `DbUpdateException` y `500`. Mapearla a `409` queda para una iteración propia, opcional.
+3. Carrera en el índice único de email: dos altas simultáneas con el mismo email pasan la consulta del handler y la segunda falla en el índice con `DbUpdateException` y `500`. Decidido no mapearla a `409`: límite aceptado para el demo, va a "qué quedó fuera".
 4. `Location` del `POST` sin `GET /{id}`: se arma con la ruta del recurso.
 
 ## Para la revisión

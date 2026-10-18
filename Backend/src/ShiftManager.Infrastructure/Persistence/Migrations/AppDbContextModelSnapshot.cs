@@ -55,6 +55,39 @@ namespace ShiftManager.Infrastructure.Persistence.Migrations
 
                     b.ToTable("collaborators", (string)null);
                 });
+
+            modelBuilder.Entity("ShiftManager.Domain.Shifts.Shift", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CollaboratorId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<TimeOnly>("EndTime")
+                        .HasColumnType("time without time zone");
+
+                    b.Property<TimeOnly>("StartTime")
+                        .HasColumnType("time without time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CollaboratorId", "Date");
+
+                    b.ToTable("shifts", (string)null);
+                });
+
+            modelBuilder.Entity("ShiftManager.Domain.Shifts.Shift", b =>
+                {
+                    b.HasOne("ShiftManager.Domain.Collaborators.Collaborator", null)
+                        .WithMany()
+                        .HasForeignKey("CollaboratorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
 #pragma warning restore 612, 618
         }
     }
