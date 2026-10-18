@@ -5,7 +5,7 @@ using ShiftManager.Domain.Shifts;
 
 namespace ShiftManager.Application.Shifts.CreateShift;
 
-public sealed class CreateShiftHandler(ICollaboratorRepository collaborators, IShiftRepository shifts)
+public sealed class CreateShiftHandler(ShiftPlacementChecker placement, IShiftRepository shifts)
     : ICommandHandler<CreateShiftCommand, Result<ShiftDto>>
 {
     public async ValueTask<Result<ShiftDto>> Handle(CreateShiftCommand command, CancellationToken cancellationToken)
@@ -18,18 +18,10 @@ public sealed class CreateShiftHandler(ICollaboratorRepository collaborators, IS
 
         var shift = created.Value;
 
-        var collaborator = await collaborators.GetByIdAsync(shift.CollaboratorId, cancellationToken);
-        if (collaborator is not { IsActive: true })
+        var placementError = await placement.CheckAsync(shift, excludingId: null, cancellationToken);
+        if (placementError is not null)
         {
-            return ShiftErrors.CollaboratorUnavailable;
-        }
-
-        var sameDay = await shifts.ListByCollaboratorAndDateAsync(
-            shift.CollaboratorId, shift.Date, excludingId: null, cancellationToken);
-        var conflicting = sameDay.FirstOrDefault(existing => shift.OverlapsWith(existing));
-        if (conflicting is not null)
-        {
-            return ShiftErrors.Overlap(conflicting.Id);
+            return placementError;
         }
 
         shifts.Add(shift);

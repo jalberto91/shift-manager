@@ -11,6 +11,9 @@ public interface ICollaboratorRepository
     Task<IReadOnlyDictionary<Guid, string>> GetCountryCodesAsync(
         IReadOnlyCollection<Guid> ids, CancellationToken cancellationToken);
 
+    Task<IReadOnlyDictionary<string, Guid>> GetIdsByEmailsAsync(
+        IReadOnlyCollection<string> emails, CancellationToken cancellationToken);
+
     Task<bool> EmailExistsAsync(string email, Guid? excludingId, CancellationToken cancellationToken);
 
     void Add(Collaborator collaborator);

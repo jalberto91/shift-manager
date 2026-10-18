@@ -24,6 +24,13 @@ public sealed class CollaboratorRepository(AppDbContext db) : ICollaboratorRepos
             .Where(c => ids.Contains(c.Id))
             .ToDictionaryAsync(c => c.Id, c => c.CountryCode, cancellationToken);
 
+    public async Task<IReadOnlyDictionary<string, Guid>> GetIdsByEmailsAsync(
+        IReadOnlyCollection<string> emails, CancellationToken cancellationToken) =>
+        await db.Collaborators
+            .AsNoTracking()
+            .Where(c => emails.Contains(c.Email))
+            .ToDictionaryAsync(c => c.Email, c => c.Id, cancellationToken);
+
     public Task<bool> EmailExistsAsync(string email, Guid? excludingId, CancellationToken cancellationToken) =>
         db.Collaborators.AnyAsync(c => c.Email == email && c.Id != excludingId, cancellationToken);
 

@@ -13,7 +13,7 @@ public class CreateShiftHandlerTests
     private readonly FakeShiftRepository _shifts = new();
 
     private Task<Result<ShiftDto>> Create(Guid collaboratorId, string start, string end, DateOnly? date = null) =>
-        new CreateShiftHandler(_collaborators, _shifts)
+        new CreateShiftHandler(new ShiftPlacementChecker(_collaborators, _shifts), _shifts)
             .Handle(
                 new CreateShiftCommand(collaboratorId, date ?? Day, TimeOnly.Parse(start), TimeOnly.Parse(end)),
                 CancellationToken.None).AsTask();

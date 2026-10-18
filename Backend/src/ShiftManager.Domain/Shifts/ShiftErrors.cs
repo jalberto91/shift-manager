@@ -19,6 +19,12 @@ public static class ShiftErrors
     public static readonly Error NotFound = Error.NotFound(
         "shift.not-found", "Shift not found.");
 
+    public static readonly Error OverlapsEarlierRow = Error.Conflict(
+        "shift.overlap", "The shift overlaps an earlier row of the same file.");
+
+    public static Error InvalidCell(string column) => Error.Validation(
+        "shift.import.cell", $"Column '{column}' is missing or has an unreadable value.");
+
     public static Error Overlap(Guid conflictingShiftId) => Error.Conflict(
         "shift.overlap",
         "The shift overlaps another shift of the same collaborator.",

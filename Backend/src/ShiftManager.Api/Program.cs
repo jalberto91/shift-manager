@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Text.Json.Serialization;
 using Scalar.AspNetCore;
 using Serilog;
+using ShiftManager.Application.Shifts;
 using ShiftManager.Infrastructure;
 using ShiftManager.Infrastructure.Persistence;
 
@@ -30,6 +31,7 @@ try
     builder.Services.AddOpenApi();
 
     builder.Services.AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped);
+    builder.Services.AddScoped<ShiftPlacementChecker>();
     builder.Services.AddInfrastructure(
         builder.Configuration.GetConnectionString("Default")
         ?? throw new InvalidOperationException("Missing connection string 'ConnectionStrings:Default'."),
