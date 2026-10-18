@@ -1,5 +1,6 @@
 using Mediator;
 using Microsoft.AspNetCore.Mvc;
+using ShiftManager.Api.Contracts;
 using ShiftManager.Application.Collaborators.CreateCollaborator;
 using ShiftManager.Application.Collaborators.DeactivateCollaborator;
 using ShiftManager.Application.Collaborators.ListCollaborators;

@@ -1,5 +1,6 @@
 using Mediator;
 using Microsoft.AspNetCore.Mvc;
+using ShiftManager.Api.Contracts;
 using ShiftManager.Application.Shifts;
 using ShiftManager.Application.Shifts.CreateShift;
 using ShiftManager.Application.Shifts.DeleteShift;
