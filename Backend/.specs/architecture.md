@@ -91,7 +91,7 @@ Dependencias: `Domain ← Application ← Infrastructure ← Api` (Api compone t
 - **Contexto**: import/export `.xlsx`; EPPlus prohibido.
 - **Alternativas**: ClosedXML (MIT), MiniExcel (Apache-2.0).
 - **Decisión**: ClosedXML 0.105.1 (MIT, verificada con `license-check`; compatible con `net9.0` vía netstandard2.0/2.1). Se usa para el import (UC-06) y el export (UC-07), siempre detrás de un puerto de `Application` para que los handlers no conozcan Excel.
-- **Consecuencias**: (+) acceso celda por celda, necesario para distinguir celda fecha/hora de texto (P9). (−) arrastra varias dependencias (DocumentFormat.OpenXml, SixLabors.Fonts); sus licencias se revisan al restaurar. La lectura de fecha vs. texto se prueba al implementar el lector.
+- **Consecuencias**: (+) acceso celda por celda, necesario para distinguir celda fecha/hora de texto (P9). (−) arrastra varias dependencias (DocumentFormat.OpenXml, SixLabors.Fonts); sus licencias se revisaron al instalar: MIT (ClosedXML.Parser, DocumentFormat.OpenXml, ExcelNumberFormat, RBush.Signed) y Apache-2.0 (SixLabors.Fonts 1.0.0). La lectura de fecha vs. texto se prueba al implementar el lector.
 - **Estado**: Aceptado
 
 ### ADR-09 · Integración con Nager.Date

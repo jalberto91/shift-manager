@@ -22,6 +22,12 @@ public static class ShiftErrors
     public static readonly Error OverlapsEarlierRow = Error.Conflict(
         "shift.overlap", "The shift overlaps an earlier row of the same file.");
 
+    public static readonly Error InvalidFile = Error.Validation(
+        "shift.import.file", "The file is not a readable .xlsx workbook.");
+
+    public static Error MissingColumns(IEnumerable<string> columns) => Error.Validation(
+        "shift.import.columns", $"Missing required columns: {string.Join(", ", columns)}.");
+
     public static Error InvalidCell(string column) => Error.Validation(
         "shift.import.cell", $"Column '{column}' is missing or has an unreadable value.");
 

@@ -87,10 +87,10 @@ Con `Result` en vez de excepciones para cada fila: el informe es un resultado es
 - [x] Application: `ShiftPlacementChecker` y refactor de `CreateShift`/`UpdateShift` (iteración a)
 - [x] Application + Infrastructure: `IShiftSheetReader`, `ImportShifts` y `GetIdsByEmailsAsync` (iteración a)
 - [x] Tests: handler con fake del lector (solape en archivo, solape en BD, email desconocido/inactivo, celda inválida, parcial); el checker queda cubierto por los tests de Create y Update (iteración a)
-- [ ] Infrastructure: `ClosedXmlShiftSheetReader`; instalar ClosedXML 0.105.1 (iteración b)
-- [ ] Tests: lector con celdas fecha vs. texto, columnas en otro orden, mayúsculas (iteración b)
-- [ ] Api: acción `Import` con límite de 5 MB (iteración b)
-- [ ] Docs: `docs/api/ENDPOINTS.md`, `shifts.http` y `.xlsx` de ejemplo (iteración b)
+- [x] Infrastructure: `ClosedXmlShiftSheetReader` e instalación de ClosedXML 0.105.1; errores `shift.import.file` y `shift.import.columns` (iteración b1)
+- [x] Tests: lector con celdas fecha/hora vs. texto, columnas en otro orden y mayúsculas, filas vacías, celdas ilegibles, columnas faltantes y archivo que no es `.xlsx` (iteración b1)
+- [ ] Api: acción `Import` con límite de 5 MB, `shift.import.file-too-large` y registro del lector en DI (iteración b2)
+- [ ] Docs: `docs/api/ENDPOINTS.md`, `shifts.http` y `.xlsx` de ejemplo (iteración b2)
 
 ## Verificación
 Iteración (a): build sin warnings y 124 tests verdes (112 previos + 12 del handler). Pendiente de (b): `docker compose up --build` y subida del `.xlsx` de ejemplo (iteración b).
