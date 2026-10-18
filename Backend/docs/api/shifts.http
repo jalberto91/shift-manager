@@ -62,13 +62,46 @@ Content-Type: application/json
 { "collaboratorId": "<collaboratorId>", "date": "2026-03-10", "startTime": "nope", "endTime": "13:00" }
 
 ### UC-04 · List shifts without filter
-# Response 200, ordered by date and start time:
-# [ { "id": "<guid>", "collaboratorId": "<guid>", "date": "2026-04-02", "startTime": "06:00:00", "endTime": "08:00:00" } ]
+# Response 200, ordered by date and start time. Each shift carries its holiday mark (see UC-05):
+# [ { "id": "<guid>", "collaboratorId": "<guid>", "date": "2026-03-10", "startTime": "09:00:00", "endTime": "13:00:00",
+#     "holiday": { "status": "None", "name": null, "isGlobal": null } } ]
 GET {{baseUrl}}/api/shifts
 
 ### UC-04 · List shifts in a date range (both ends included; either one can be omitted)
 # Response 200
 GET {{baseUrl}}/api/shifts?from=2026-04-01&to=2026-04-30
+
+### UC-05 · List shifts on a nationwide holiday (Collaborator in ES, date 2026-01-01)
+# Response 200, element:
+# { "date": "2026-01-01", "startTime": "09:00:00", "endTime": "13:00:00",
+#   "holiday": { "status": "Holiday", "name": "New Year's Day", "isGlobal": true } }
+GET {{baseUrl}}/api/shifts?from=2026-01-01&to=2026-01-01
+
+### UC-05 · List shifts on a regional holiday (Collaborator in ES, date 2026-02-28)
+# Response 200, element: the collaborator only has a country, so a regional holiday is marked with isGlobal false.
+# { "date": "2026-02-28", "startTime": "09:00:00", "endTime": "13:00:00",
+#   "holiday": { "status": "Holiday", "name": "Day of Andalucía", "isGlobal": false } }
+GET {{baseUrl}}/api/shifts?from=2026-02-28&to=2026-02-28
+
+### UC-05 · List shifts on an ordinary day
+# Response 200, element:
+# { "date": "2026-02-10", "startTime": "09:00:00", "endTime": "13:00:00",
+#   "holiday": { "status": "None", "name": null, "isGlobal": null } }
+GET {{baseUrl}}/api/shifts?from=2026-02-10&to=2026-02-10
+
+### UC-05 · List shifts of collaborators from different countries (AR and MX on 2026-04-02)
+# Response 200, each shift uses the country of its collaborator:
+# { "date": "2026-04-02", "startTime": "06:00:00", "endTime": "08:00:00",
+#   "holiday": { "status": "Holiday", "name": "Day of the Veterans and Fallen of the Malvinas War", "isGlobal": true } }
+# { "date": "2026-04-02", "startTime": "08:00:00", "endTime": "15:00:00",
+#   "holiday": { "status": "Holiday", "name": "Maundy Thursday", "isGlobal": true } }
+GET {{baseUrl}}/api/shifts?from=2026-04-02&to=2026-04-02
+
+### UC-05 · List shifts while Nager.Date does not answer
+# Response 200 in about 3 s (client timeout), every shift with the status Unknown; the failure is not cached.
+# { "date": "2026-01-01", "startTime": "09:00:00", "endTime": "13:00:00",
+#   "holiday": { "status": "Unknown", "name": null, "isGlobal": null } }
+GET {{baseUrl}}/api/shifts
 
 ### UC-04 · List shifts with from later than to
 # Response 400:

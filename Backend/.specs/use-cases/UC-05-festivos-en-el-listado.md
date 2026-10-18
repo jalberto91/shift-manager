@@ -1,5 +1,5 @@
 # UC-05 · Festivos en el listado de turnos
-> En curso (a: spec, puerto y handler; b: cliente Nager.Date, endpoint, docs y E2E) · rama `main` · 2026-10-17 · cubre: R6 · decisión P10 · ADR-09
+> Hecho (a: spec, puerto y handler; b1: cliente Nager.Date v4; b2: docs y E2E) · rama `main` · 2026-10-17 · cubre: R6 · decisión P10 · ADR-09
 
 ## Requirements
 - El listado de turnos señala los que caen en festivo del país del colaborador, con el nombre del festivo.
@@ -8,12 +8,12 @@
 - Los turnos de colaboradores dados de baja se siguen marcando (ADR-11).
 
 Criterios de aceptación:
-- [ ] `GET /api/shifts` → cada turno incluye `holiday: { status, name, isGlobal }`.
-- [ ] Turno en festivo global → `status = Holiday`, `name`, `isGlobal = true`.
-- [ ] Turno en festivo regional → `status = Holiday`, `name`, `isGlobal = false`.
-- [ ] Turno en día normal → `status = None`, `name = null`, `isGlobal = null`.
-- [ ] Nager.Date caído o con error → `200` con `status = Unknown` en los turnos afectados; nunca `5xx` por la API externa.
-- [ ] Un fallo no se cachea: la siguiente petición vuelve a intentarlo.
+- [x] `GET /api/shifts` → cada turno incluye `holiday: { status, name, isGlobal }`.
+- [x] Turno en festivo global → `status = Holiday`, `name`, `isGlobal = true`.
+- [x] Turno en festivo regional → `status = Holiday`, `name`, `isGlobal = false`.
+- [x] Turno en día normal → `status = None`, `name = null`, `isGlobal = null`.
+- [x] Nager.Date caído o con error → `200` con `status = Unknown` en los turnos afectados; nunca `5xx` por la API externa.
+- [x] Un fallo no se cachea: la siguiente petición vuelve a intentarlo.
 
 Casos límite:
 - Colaboradores de países distintos en el mismo listado → cada turno usa el país de su colaborador.
@@ -50,12 +50,19 @@ Casos límite:
 - [x] Tests: handler con festivo global, regional, día normal, `Unknown`, países distintos, una consulta por país+año, colaborador de baja y listado vacío (iteración a)
 - [x] Infrastructure: `NagerDatePublicHolidayCatalog` con caché y timeout de 3 s, registro en `AddInfrastructure` y consulta en paralelo en el handler (iteración b1)
 - [x] Tests: cliente con `HttpMessageHandler` falso (mapeo global y regional, ruta, caché, fallo y JSON inválido sin cachear) (iteración b1)
-- [ ] Api: sin cambios de código más allá del tipo documentado en `ProducesResponseType` (ya hecho en a)
-- [ ] Docs: `docs/api/ENDPOINTS.md` y `shifts.http` con respuestas reales (iteración b2)
-- [ ] E2E con `verify`, incluido Nager.Date inaccesible (iteración b2)
+- [x] Api: sin cambios de código más allá del tipo documentado en `ProducesResponseType` (hecho en a)
+- [x] Docs: `docs/api/ENDPOINTS.md` y `shifts.http` con respuestas reales (iteración b2)
+- [x] E2E con `verify`, incluido Nager.Date inaccesible (iteración b2)
 
 ## Verificación
-Iteración a: build sin warnings, 105 tests verdes. Iteración b1: build sin warnings, 111 tests verdes. E2E pendiente de (b2), incluido el caso con Nager.Date inaccesible.
+2026-10-17, `docker compose up --build` y curl contra PostgreSQL y la API real de Nager.Date v4, build sin warnings y 112 tests verdes:
+- Festivo nacional (`ES`, 2026-01-01 y 2027-01-01): `Holiday`, `New Year's Day`, `isGlobal = true`. Regional (`ES`, 2026-02-28): `Day of Andalucía`, `isGlobal = false`. Día normal (`ES`, 2026-02-10): `None` con `name` e `isGlobal` nulos.
+- Países distintos el mismo día (2026-04-02): AR (Carla) marca el festivo de Malvinas y MX (Diego) marca el Jueves Santo.
+- Dos años para el mismo país en el mismo listado (`ES` 2026 y 2027): cada turno usa su año.
+- Con Nager.Date inaccesible (`NagerDate__BaseUrl` hacia una IP sin respuesta): `200` en 3,5 s con 5 pares país+año y todos los turnos en `Unknown`, un warning por par en el log. Sin la consulta en paralelo habría sido cercano a 15 s.
+- Recuperación: con el servicio de vuelta, la primera llamada tarda 0,8 s y marca los festivos (el fallo no quedó guardado) y la segunda, con caché, 0,04 s.
+- La API arranca con el cliente registrado (la duda sobre el arranque del contenedor de DI queda resuelta).
+- Sin ejercitar por la API: la prioridad del festivo nacional sobre uno regional del mismo día (cubierta con un test). Las fechas repetidas de España 2026 que se miraron (por ejemplo 2026-04-23: Castilla y León y Aragón) son dos festivos regionales, no uno nacional y otro regional.
 
 ## TBDs
 1. Si el modelo gana una región por colaborador, el festivo regional podría filtrarse por `subdivisionCodes` en vez de solo marcarse.
@@ -65,3 +72,5 @@ Iteración a: build sin warnings, 105 tests verdes. Iteración b1: build sin war
 - `ShiftDto` queda intacto y el listado tiene su propio DTO: el cambio es aditivo y no arrastra la consulta de festivos a `POST`/`PUT`/`GET /{id}`.
 - El puerto reutiliza la convención de `ICountryCatalog` (`null` = no respondió), sin tipos de error nuevos.
 - Una consulta por país+año por listado, y caché solo de aciertos para que un fallo no quede fijado.
+- Los pares se consultan en paralelo: con la API caída el listado tarda un timeout (3 s), no uno por par. Sin resilience handler ni reintentos (ADR-09), porque la siguiente petición ya reintenta.
+- Los clientes usan la v4 de Nager.Date: la v3 está deprecada y el enunciado la cita; el choque queda registrado en ADR-09.

@@ -8,7 +8,7 @@ Contrato que lee el front. Se actualiza al cerrar cada UC. Las rutas van en ingl
 | UC-02 | POST/PUT/DELETE | `/api/collaborators[/{id}]` | Alta, edición, baja lógica | hecho |
 | UC-03 | POST | `/api/shifts` | Alta de turno (409 si solapa) | hecho |
 | UC-04 | GET/PUT/DELETE | `/api/shifts[/{id}]` | Listar con rango de fechas, leer, editar, borrar | hecho |
-| UC-05 | GET | `/api/shifts` | Incluye marca de festivo | pendiente |
+| UC-05 | GET | `/api/shifts` | Incluye marca de festivo | hecho |
 | UC-06 | POST | `/api/shifts/import` | Importar `.xlsx` con informe | pendiente |
 | UC-07 | GET | `/api/shifts/export` | Exportar `.xlsx` por rango | pendiente |
 | — | GET | `/health` | Health check (incluye la BD) | hecho |
@@ -81,3 +81,22 @@ Ejemplos en [shifts.http](shifts.http). `PUT` recibe el mismo cuerpo que el alta
 | `shift.not-found` | 404 | El `id` no existe |
 
 Un `from` o `to` con formato inválido lo rechaza el binder con `400` y la clave de `errors` es el nombre del parámetro (`from`, `to`).
+
+## UC-05 · Festivos en GET /api/shifts
+
+Cada turno del listado lleva `holiday`, calculado con los festivos de Nager.Date del país del colaborador. Solo cambia `GET /api/shifts`; `POST`, `PUT` y `GET /api/shifts/{id}` devuelven el turno sin `holiday`. Ejemplos en [shifts.http](shifts.http).
+
+```json
+{ "id": "<guid>", "collaboratorId": "<guid>", "date": "2026-02-28", "startTime": "09:00:00", "endTime": "13:00:00",
+  "holiday": { "status": "Holiday", "name": "Day of Andalucía", "isGlobal": false } }
+```
+
+| `holiday.status` | `name` | `isGlobal` | Significa |
+|---|---|---|---|
+| `None` | `null` | `null` | El día no es festivo en el país del colaborador |
+| `Holiday` | nombre en inglés | `true` / `false` | Festivo nacional (`true`) o solo de algunas regiones (`false`) |
+| `Unknown` | `null` | `null` | Nager.Date no respondió; el turno se lista igual |
+
+- El colaborador solo tiene país, no región: un festivo regional se marca igual, con `isGlobal = false`. Si el mismo día hay uno nacional y uno regional, gana el nacional.
+- Con Nager.Date caído el listado responde `200` con `Unknown` y tarda como máximo unos 3 s (timeout del cliente); el fallo no se guarda, así que la siguiente petición vuelve a intentarlo. Los aciertos se guardan 24 h por país y año.
+- Los turnos de colaboradores dados de baja también se marcan.
