@@ -25,7 +25,7 @@ En desarrollo `ng serve` usa `proxy.conf.json` hacia `http://localhost:5080`; en
 | Errores | Problem Details → interceptor → servicio de notificaciones; errores de negocio por código → control del form; textos propios en español | ✅ ADR-04 |
 | Fechas/horas | Texto sin zona: fecha `yyyy-MM-dd`, hora `HH:mm` (el backend responde `HH:mm:ss`; se muestra `HH:mm`). Hora de reloj local del colaborador, sin conversiones (P12). No se usa `Date` para fechas puras | ✅ ADR-04 |
 | Números/moneda | No aplica | ✅ |
-| Locale | `es` para pipes y componentes de PrimeNG | TBD (Fase 2) |
+| Locale | Textos propios en español; fechas y horas con inputs nativos (`date`, `time`), sin DatePicker de PrimeNG ni locale registrado | ✅ |
 | Paginación y filtros | Sin paginación (P13). Filtro por rango de fechas en el listado de turnos, enviado como query al backend | ✅ |
 | Autenticación | Ninguna: sin guards ni interceptor de auth | ✅ ADR-06 |
 | Config | URL de la API siempre relativa (`/api`) | ✅ ADR-07 |

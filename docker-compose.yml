@@ -27,5 +27,12 @@ services:
       - "5080:8080"
     restart: on-failure
 
+  web:
+    build: ./FrontEnd
+    depends_on:
+      - api
+    ports:
+      - "4200:80"
+
 volumes:
   db-data:
